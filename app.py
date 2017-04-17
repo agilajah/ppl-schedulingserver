@@ -2,6 +2,16 @@ from random import randint, shuffle, seed
 from math import ceil, floor
 from copy import deepcopy
 
+from flask import Flask
+from flask import request
+from flask import make_response
+# Flask app should start in global layout
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
 class Genetic:
     inputs = []
     result = []
@@ -430,3 +440,11 @@ for i in range(M.row):
 		print (M.matriks[i][j], end='')
 	print()
 	print()
+	
+	
+if __name__ == "__main__":
+    port = int(os.getenv('PORT', 5000))
+
+    print("Starting app on port %d" % port)
+
+    app.run(debug=False, port=port, host='0.0.0.0')
