@@ -1,3 +1,5 @@
+import os
+
 from random import randint, shuffle, seed
 from math import ceil, floor
 from copy import deepcopy
@@ -414,33 +416,33 @@ class Ruangan:
         self.jam_akhir = jam_akhir
         self.hari = hari
 
-		
-Jadwal('SourcePythonTubesAIRadit/Testcases/m1_abnormal.txt')		
-Assign()
-Genetic()
-Genetic.init()
-Genetic.add(Assign.daftar_matkul_time)
-Genetic.run(100)
-Genetic.sort()
-M = Genetic.convertToMatriks(Genetic.best())
-for i in range(M.row):
-	for j in range(6,18,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(30,42,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(54,66,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(78,90,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(102,114,1):
-		print (M.matriks[i][j], end='')
-	print()
-	print()
-	
+#
+# Jadwal('SourcePythonTubesAIRadit/Testcases/m1_abnormal.txt')
+# Assign()
+# Genetic()
+# Genetic.init()
+# Genetic.add(Assign.daftar_matkul_time)
+# Genetic.run(100)
+# Genetic.sort()
+# M = Genetic.convertToMatriks(Genetic.best())
+# for i in range(M.row):
+# 	for j in range(6,18,1):
+# 		print (M.matriks[i][j], end='')
+# 	print()
+# 	for j in range(30,42,1):
+# 		print (M.matriks[i][j], end='')
+# 	print()
+# 	for j in range(54,66,1):
+# 		print (M.matriks[i][j], end='')
+# 	print()
+# 	for j in range(78,90,1):
+# 		print (M.matriks[i][j], end='')
+# 	print()
+# 	for j in range(102,114,1):
+# 		print (M.matriks[i][j], end='')
+# 	print()
+# 	print()
+#
 	
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
