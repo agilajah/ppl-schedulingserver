@@ -1,0 +1,29 @@
+rooms = [('namaRuangan',jamMulai,jamSelesai,[list hari hari]),....]
+
+schedules = [('namaJadwal','namaRuangan',jamMulai, jamSelesai, SKS, [list hari hari]),....]
+
+Hasil0000_1159=
+[
+	#ruangan pertama
+	[
+		('-','IF2200','-',...,'IF3000'), #jadwal hari senin dari 00.00 - 11.59
+		('-','-','-',...,'IF4555'), #jadwal hari selasa dari 00.00 - 11.59
+		...,
+		('-','-','-',...,'IF4555') #jadwal hari jumat dari 00.00 - 11.59
+	],
+	#ruangan kedua, ketiga, dst.
+	...
+]
+
+Hasil1200_2359=
+[
+	#ruangan pertama
+	[
+		('-','IF2200','-',...,'IF3000'), #jadwal hari senin dari 12.00 - 23.59
+		('-','-','-',...,'IF4555'), #jadwal hari selasa dari 12.00 - 23.59
+		...,
+		('-','-','-',...,'IF4555') #jadwal hari jumat dari 12.00 - 23.59
+	],
+	#ruangan kedua, ketiga, dst.
+	...
+]
