@@ -417,7 +417,7 @@ class Ruangan:
         self.jam_akhir = jam_akhir	#hapus
         self.hari = hari			#hapus
 		
-<<<<<<< HEAD
+
 		
 class Mahasiswa:
 	def __init__(self, event, user_id, email, dosen):
@@ -426,56 +426,6 @@ class Mahasiswa:
 		self.email = email
 		self.dosen = dosen
 	
-=======
-		
-class Mahasiswa:
-	def __init__(self, event, user_id, email, dosen):
-		self.event = event
-		self.user_id = user_id
-		self.email = email
-		self.dosen = dosen
-	
-	
-class Dosen:
-	def __init__(self, event, user_id, email):
-		self.event = event
-		self.user_id = user_id
-		self.email = email
-
-		
-class Event:
-	def __init__(self, name, date_start, date_end):
-		self.name = name
-		self.date_start = date_start
-		self.date_end = date_end
-		
-Jadwal('SourcePythonTubesAIRadit/Testcases/m1_abnormal.txt')		
-Assign()
-Genetic()
-Genetic.init()
-Genetic.add(Assign.daftar_matkul_time)
-Genetic.run(100)
-Genetic.sort()
-M = Genetic.convertToMatriks(Genetic.best())
-for i in range(M.row):
-	for j in range(7,18,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(31,42,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(55,66,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(79,90,1):
-		print (M.matriks[i][j], end='')
-	print()
-	for j in range(10,114,1):
-		print (M.matriks[i][j], end='')
-	print()
-	print()
-
->>>>>>> 6eaf258677418b24842e867740b72afd95bcc8d7
 	
 class Dosen:
 	def __init__(self, event, user_id, email):
