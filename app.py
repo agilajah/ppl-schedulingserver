@@ -19,7 +19,7 @@ api = Api(app)
 
 parser = reqparse.RequestParser()
 parser.add_argument('student_data', type=str, required=False, help='please input student data (json)', location='json')
-parser.add_argument('professor_data', type=str, required=False, help='please input professor data (json)', location='json')
+parser.add_argument('lecturer_data', type=str, required=False, help='please input lecturer data (json)', location='json')
 
 class Home(Resource):
     def post(self):
@@ -35,7 +35,15 @@ def student_data_parser():
 def professor_data_parser():
     return 1
 
-class input_json(Resource):
+def create_list_of_events(student_data = None, lecturer_data = None):
+    if student_data is None or lecturer_data is None:
+        print ('We need both of student and lecturer data to proceed')
+    else:
+        print('wait')
+        return 1
+        # process the data
+
+class Scheduler(Resource):
     def post(self):
         args = parser.parse_args(strict=True) 
         data_json = {}
@@ -44,7 +52,7 @@ class input_json(Resource):
                 data_json[k] = v
 
         student_data = data_json['student_data']
-        professor_data = data_json['professor_data']
+        lecturer_data = data_json['lecturer_data']
         # parse student_data
         # parse professor_data
 
@@ -504,7 +512,7 @@ class Assign:
 # 	print()
 #
 
-api.add_resource(Data, '/ppl-scheduling/api/v1/data/')
+api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
 api.add_resource(Home, '/', endpoint = "home")
 	
 if __name__ == "__main__":
