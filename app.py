@@ -98,7 +98,7 @@ def create_initial_data(temp_data = None):
         data['students_list'] = student_data_parser(temp_data['student_data'])
         data['lecturers_list'] = lecturer_data_parser(temp_data['lecturer_data'])
         # create session from given students and lecturers list
-        data['sessions_list'] = create_sessions(data.students, data.lecturers)
+        data['sessions_list'] = create_sessions(data['students_list'], data['lecturers_list'])
         # process the data
         # # Assign()
         # Genetic()
@@ -175,13 +175,13 @@ class Event(object):
 
 class Session(object):
     def __init__(self, session_id = None, name = None, student_id = None, lecturers_id = None, \
-                 date_start = None, date_end = None):
+                 events = None, days = None):
         self.session_id = session_id
         self.name = name
         self.student_id = student_id
         self.lecturers_id = lecturers_id
-        self.data_start = date_start
-        self.data_end = date_end
+        self.list_of_event = events
+        self.list_of_day = days
 
 class Genetic:
     inputs = []
