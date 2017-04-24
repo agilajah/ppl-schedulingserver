@@ -29,18 +29,50 @@ class Home(Resource):
     def put(self):
         return 'Hello Wolrd'
 
-def student_data_parser():
+
+def student_data_parser(student_data):
+    students = []
+    for i in student_data:
+        temp_student_data = student_data[i]
+        temp_student = Mahasiswa()
+        temp_student.user_id = temp_student_data['user_id']
+        temp_student.dosen_pembimbing_id = temp_student_data['id_dosen_pembimbing']
+        temp_student.first_name = temp_student_data['user_name']
+        temp_student.last_name = temp_student_data['last_name']
+        temp_student.email = temp_student_data['email']
+        temp_student.topic = temp_student_data['topic']
+        list_of_events = []
+        # create event
+        try:
+            event_json = temp_student_data['event']
+        except:
+            print('Event kosong')
+        if event_json is not None:
+            for j in event_json:
+                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
+                    event_json[j].date_end)
+                list_of_events.append(temp_event)
+
+        # now we append all of those information here
+        students.append(temp_student)
+
+
+def lecturer_data_parser(lecturer_data):
     return 1
 
-def professor_data_parser():
-    return 1
+def create_sessions(students_list = None, lecturers_list = None):
+    return 0
 
-def create_list_of_events(student_data = None, lecturer_data = None):
-    if student_data is None or lecturer_data is None:
+def create_initial_data(temp_data = None):
+    if temp_data is None:
         print ('We need both of student and lecturer data to proceed')
     else:
-        print('wait')
-        return 1
+        # create dictionary of lists
+        data = {}
+        data['students_list'] = student_data_parser(temp_data['student_data'])
+        data['lecturers_list'] = lecturer_data_parser(temp_data['lecturer_data'])
+        # create session from given students and lecturers list
+        data['sessions_list'] = create_sessions(data.students, data.lecturers)
         # process the data
         # # Assign()
         # Genetic()
@@ -48,6 +80,12 @@ def create_list_of_events(student_data = None, lecturer_data = None):
         # Genetic.add(Assign.daftar_matkul_time)
         # Genetic.run(100)
         # Genetic.sort()
+
+class Data():
+    def __init__(self, students=None, lecturers=None, sessions=None):
+        self.students = students
+        self.lecturers = lecturers
+        self.sessions = sessions
 
 class Scheduler(Resource):
     def post(self):
@@ -57,14 +95,19 @@ class Scheduler(Resource):
             if v is not None:
                 data_json[k] = v
 
-        student_data = data_json['student_data']
-        lecturer_data = data_json['lecturer_data']
+        temp_data = json.load(data_json)
+        # student_data = temp_data['student_data']
+        # lecturer_data = temp_data['lecturer_data']
         # parse student_data
         # parse professor_data
+        # the result is dictionary of lists
+        result_data = create_initial_data(temp_data)
+        #create data object
 
-        #parsed_student_data = student_data_parser(student_data)
+        return 1
 
-class Ruangan:
+
+class Ruangan(object):
     def __init__(self, idruangan, nama, jam_awal, jam_akhir, hari):
         self.idruangan = idruangan
         self.nama = nama
@@ -74,30 +117,35 @@ class Ruangan:
 
 
 
-class Mahasiswa:
-    def __init__(self, event, user_id, email, dosen):
+class Mahasiswa(object):
+    def __init__(self, event = None, user_id = None, first_name=None, last_name = None, \
+                 email = None, topic = None, id_dosen_pembimbing= None):
         self.event = event
         self.user_id = user_id
         self.email = email
-        self.dosen = dosen
+        self.dosen_pembimbing_id = id_dosen_pembimbing
+        self.first_name = first_name
+        self.last_name = last_name
+        self.topic = topic
 
 
-class Dosen:
-    def __init__(self, event, user_id, email):
+class Dosen(object):
+    def __init__(self, event = None, user_id = None, email = None):
         self.event = event
         self.user_id = user_id
         self.email = email
 
 
-class Event:
-    def __init__(self, name, event_id, date_start, date_end):
+class Event(object):
+    def __init__(self, name = None, event_id = None, date_start = None, date_end = None):
         self.name = name
-        self.event_id
-        self.date_start
-        self.data_end
+        self.event_id = event_id
+        self.date_start = date_start
+        self.data_end = date_end
 
-class Session:
-    def __init__(self, session_id, name, student_id, lecturers_id, date_start, date_end):
+class Session(object):
+    def __init__(self, session_id = None, name = None, student_id = None, lecturers_id = None, \
+                 date_start = None, date_end = None):
         self.session_id = session_id
         self.name = name
         self.student_id = student_id
