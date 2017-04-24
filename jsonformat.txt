@@ -1,33 +1,60 @@
-user : { 
-   events : [ { name : 'makan sate', date_start : ' 232131231231',
-   		date_end : '342323343' }, {name : 'makan sate', 
-                date_start : ' 232131231231', date_end : '342323343' }, 
-	     { name : 'makan sate', date_start : ' 232131231231', 	 
-                date_end : '342323343' }, { name : 'makan sate', 
-		date_start : ' 232131231231', date_end : '342323343' } ],
-   user_id : '3242342342'
-   email : 'haha@hehe.com',
-   id_dosen : [{87614873}, {8731}]
-}
-
-dosen : {
-   events : [ { name : 'makan sate', date_start : ' 232131231231',
-   		date_end : '342323343' }, {name : 'makan sate', 
-                date_start : ' 232131231231', date_end : '342323343' }, 
-	     { name : 'makan sate', date_start : ' 232131231231', 	 
-                date_end : '342323343' }, { name : 'makan sate', 
-		date_start : ' 232131231231', date_end : '342323343' } ],
-   user_id : '3242342342'
-   email : 'haha@hehe.com',
-
-}
-
-ruang : { 
-   events : [ { name : 'makan sate', date_start : ' 232131231231',
-   		date_end : '342323343' }, {name : 'makan sate', 
-                date_start : ' 232131231231', date_end : '342323343' }, 
-	     { name : 'makan sate', date_start : ' 232131231231', 	 
-                date_end : '342323343' }, { name : 'makan sate', 
-		date_start : ' 232131231231', date_end : '342323343' } ],
-   user_id : '3242342342'
+{ 
+  "student_data" : [ 
+  { 
+    "user_id": "58f9dd95332d8741421e475a", 
+    "name": { 
+      "first": "Fleming", 
+      "last": "Parker" 
+    }, 
+    "topics": [ 
+      "machine learning" 
+    ], 
+    "email": "fleming.parker@undefined.biz", 
+    "id_dosen_pebimbing": "58f9dc043d4f0ffb6064f7c1", 
+    "id_dosen_penguji": ["243243242", "3243242344"], 
+    "events": [ 
+      { 
+        "event_id" : "3242342342", 
+        "event_name" : "makan bareng tatjana saphira", 
+        "start_date": "2017-05-17 00:00:00", 
+        "end_date": "2017-05-17 02:00:00" 
+      } 
+    ] 
+  }, 
+], 
+"lecturer_data" : [ 
+  { 
+    "user_id": "58f9dc03ad06bed579a88197", 
+    "name": { 
+      "first": "Lourdes", 
+      "last": "Ellis" 
+    }, 
+    "topics": [ 
+      "database", 
+      "graphic", 
+      "database" 
+    ], 
+    "email": "lourdes.ellis@undefined.us", 
+    "events": [ 
+      { 
+        "event_id": "3453454353", 
+        "event_name": "hehehe", 
+        "start_date": "2017-05-01 00:00:00", 
+        "end_date": "2017-05-01 02:00:00" 
+      }, 
+      { 
+        "event_id": "3453454353", 
+        "event_name": "hehehe", 
+        "start_date": "2017-05-17 00:00:00", 
+        "end_date": "2017-05-17 02:00:00" 
+      }, 
+      { 
+        "event_id": "3453454353", 
+        "event_name": "hehehe", 
+        "start_date": "2017-04-30 00:00:00", 
+        "end_date": "2017-04-30 02:00:00" 
+      } 
+    ] 
+  } 
+ ] 
 }
