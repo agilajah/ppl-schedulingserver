@@ -40,7 +40,7 @@ def student_data_parser(student_data):
         temp_student.first_name = temp_student_data['user_name']
         temp_student.last_name = temp_student_data['last_name']
         temp_student.email = temp_student_data['email']
-        temp_student.topic = temp_student_data['topic']
+        temp_student.topics = temp_student_data['topics']
         list_of_events = []
         # create event
         try:
@@ -56,9 +56,35 @@ def student_data_parser(student_data):
         # now we append all of those information here
         students.append(temp_student)
 
+    return students
+
 
 def lecturer_data_parser(lecturer_data):
-    return 1
+    lecturers = []
+    for i in lecturer_data:
+        temp_lecturer_data = lecturer_data[i]
+        temp_lecturer = Dosen()
+        temp_lecturer.user_id = temp_lecturer_data['user_id']
+        temp_lecturer.first_name = temp_lecturer_data['user_name']
+        temp_lecturer.last_name = temp_lecturer_data['last_name']
+        temp_lecturer.email = temp_lecturer_data['email']
+        temp_lecturer.topics = temp_lecturer_data['topics']
+        list_of_events = []
+        # create event
+        try:
+            event_json = temp_lecturer_data['event']
+        except:
+            print('Event kosong')
+        if event_json is not None:
+            for j in event_json:
+                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
+                                   event_json[j].date_end)
+                list_of_events.append(temp_event)
+
+        # now we append all of those information here
+        lecturers.append(temp_lecturer)
+
+    return lecturers
 
 def create_sessions(students_list = None, lecturers_list = None):
     return 0
@@ -119,21 +145,25 @@ class Ruangan(object):
 
 class Mahasiswa(object):
     def __init__(self, event = None, user_id = None, first_name=None, last_name = None, \
-                 email = None, topic = None, id_dosen_pembimbing= None):
+                 email = None, topics = None, id_dosen_pembimbing= None):
         self.event = event
         self.user_id = user_id
         self.email = email
         self.dosen_pembimbing_id = id_dosen_pembimbing
         self.first_name = first_name
         self.last_name = last_name
-        self.topic = topic
-
+        self.topics = topics
 
 class Dosen(object):
-    def __init__(self, event = None, user_id = None, email = None):
+    def __init__(self, event = None, user_id = None, first_name=None, last_name = None, \
+                 email = None, topics = None):
         self.event = event
         self.user_id = user_id
         self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+        self.topics = topics
+
 
 
 class Event(object):
