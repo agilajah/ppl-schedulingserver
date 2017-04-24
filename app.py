@@ -4,15 +4,84 @@ from random import randint, shuffle, seed
 from math import ceil, floor
 from copy import deepcopy
 
-from flask import Flask
+from flask import Flask, jsonify, json
 from flask import request
 from flask import make_response
+from flask_restful import Api, Resource
+from flask_restful import reqparse
+from datetime import datetime
 # Flask app should start in global layout
+
+
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+api = Api(app)
+
+parser = reqparse.RequestParser()
+parser.add_argument('student_data', type=str, required=False, help='please input student data (json)', location='json')
+parser.add_argument('professor_data', type=str, required=False, help='please input professor data (json)', location='json')
+
+class Home(Resource):
+    def post(self):
+        return 'Hello World'
+    def get(self):
+        return 'Hello World'
+    def put(self):
+        return 'Hello Wolrd'
+
+def student_data_parser():
+    return 1
+
+def professor_data_parser():
+    return 1
+
+class input_json(Resource):
+    def post(self):
+        args = parser.parse_args(strict=True) 
+        data_json = {}
+        for k, v in args.items():
+            if v is not None:
+                data_json[k] = v
+
+        student_data = data_json['student_data']
+        professor_data = data_json['professor_data']
+        # parse student_data
+        # parse professor_data
+
+        #parsed_student_data = student_data_parser(student_data)
+
+class Ruangan:
+    def __init__(self, idruangan, nama, jam_awal, jam_akhir, hari):
+        self.idruangan = idruangan
+        self.nama = nama
+        self.jam_awal = jam_awal    #hapus
+        self.jam_akhir = jam_akhir	#hapus
+        self.hari = hari			#hapus
+		
+
+		
+class Mahasiswa:
+	def __init__(self, event, user_id, email, dosen):
+		self.event = event
+		self.user_id = user_id
+		self.email = email
+		self.dosen = dosen
+	
+	
+class Dosen:
+	def __init__(self, event, user_id, email):
+		self.event = event
+		self.user_id = user_id
+		self.email = email
+
+		
+class Event:
+	def __init__(self, name, date_start, date_end):
+		self.name = name
+		self.date_start = date_start
+		self.date_end = date_end
+		
+
 
 class Genetic:
     inputs = []
@@ -406,41 +475,6 @@ class Assign:
 			matkul.idmatkul = cnt
 			cnt += 1
 
-			
-			
-			
-class Ruangan:
-    def __init__(self, idruangan, nama, jam_awal, jam_akhir, hari):
-        self.idruangan = idruangan
-        self.nama = nama
-        self.jam_awal = jam_awal    #hapus
-        self.jam_akhir = jam_akhir	#hapus
-        self.hari = hari			#hapus
-		
-
-		
-class Mahasiswa:
-	def __init__(self, event, user_id, email, dosen):
-		self.event = event
-		self.user_id = user_id
-		self.email = email
-		self.dosen = dosen
-	
-	
-class Dosen:
-	def __init__(self, event, user_id, email):
-		self.event = event
-		self.user_id = user_id
-		self.email = email
-
-		
-class Event:
-	def __init__(self, name, date_start, date_end):
-		self.name = name
-		self.date_start = date_start
-		self.date_end = date_end
-		
-
 
 #
 # Jadwal('SourcePythonTubesAIRadit/Testcases/m1_abnormal.txt')
@@ -469,6 +503,9 @@ class Event:
 # 	print()
 # 	print()
 #
+
+api.add_resource(Data, '/ppl-scheduling/api/v1/data/')
+api.add_resource(Home, '/', endpoint = "home")
 	
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
