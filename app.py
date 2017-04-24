@@ -108,7 +108,7 @@ def create_initial_data(temp_data = None):
         # Genetic.add(Assign.daftar_matkul_time)
         # Genetic.run(100)
         # Genetic.sort()
-# 		
+#
 # def get_year():
 # 	now = datetime.datetime.now()
 # 	return now.year
@@ -142,22 +142,92 @@ class Data():
 
 class Scheduler(Resource):
     def post(self):
-        args = parser.parse_args(strict=True)
-        data_json = {}
-        for k, v in args.items():
-            if v is not None:
-                data_json[k] = v
-
-        temp_data = json.load(data_json)
-        # student_data = temp_data['student_data']
-        # lecturer_data = temp_data['lecturer_data']
-        # parse student_data
-        # parse professor_data
-        # the result is dictionary of lists
-        result_data = create_initial_data(temp_data)
-        #create data object
-
-        return 1
+        # args = parser.parse_args(strict=True)
+        # data_json = {}
+        # for k, v in args.items():
+        #     if v is not None:
+        #         data_json[k] = v
+        #
+        # temp_data = json.load(data_json)
+        # # student_data = temp_data['student_data']
+        # # lecturer_data = temp_data['lecturer_data']
+        # # parse student_data
+        # # parse professor_data
+        # # the result is dictionary of lists
+        # result_data = create_initial_data(temp_data)
+        # #create data object
+        data = [{
+  "id" : "87623",
+  "nama" : "Sidang si A",
+  "ruang" : "7602",
+  "start_date": "2017-05-01 07:00:00",
+  "end_date": "2017-05-01 08:00:00"
+ },
+ {
+  "id" : "87624",
+  "nama" : "Sidang si B",
+  "ruang" : "7606",
+  "start_date": "2017-05-01 07:00:00",
+  "end_date": "2017-05-01 08:00:00"
+ },
+ {
+  "id" : "87625",
+  "nama" : "Sidang si C",
+  "ruang" : "7602",
+  "start_date": "2017-05-01 08:00:00",
+  "end_date": "2017-05-01 09:00:00"
+ },
+ {
+  "id" : "87626",
+  "nama" : "Sidang si D",
+  "ruang" : "7602",
+  "start_date": "2017-05-01 09:00:00",
+  "end_date": "2017-05-01 10:00:00"
+ },
+ {
+  "id" : "87627",
+  "nama" : "Sidang si E",
+  "ruang" : "7606",
+  "start_date": "2017-05-01 08:00:00",
+  "end_date": "2017-05-01 09:00:00"
+ },
+ {
+  "id" : "87628",
+  "nama" : "Sidang si F",
+  "ruang" : "7606",
+  "start_date": "2017-05-01 09:00:00",
+  "end_date": "2017-05-01 10:00:00"
+ },
+ {
+  "id" : "87629",
+  "nama" : "Sidang si G",
+  "ruang" : "7602",
+  "start_date": "2017-05-02 07:00:00",
+  "end_date": "2017-05-02 08:00:00"
+ },
+ {
+  "id" : "87630",
+  "nama" : "Sidang si H",
+  "ruang" : "7602",
+  "start_date": "2017-05-02 09:00:00",
+  "end_date": "2017-05-02 10:00:00"
+ },
+ {
+  "id" : "87631",
+  "nama" : "Sidang si I",
+  "ruang" : "7606",
+  "start_date": "2017-05-02 07:00:00",
+  "end_date": "2017-05-02 08:00:00"
+ },
+ {
+  "id" : "87632",
+  "nama" : "Sidang si J",
+  "ruang" : "7606",
+  "start_date": "2017-05-01 08:00:00",
+  "end_date": "2017-05-01 09:00:00"
+ }
+]
+        return jsonify({"result": data})
 
 
 class Ruangan(object):
