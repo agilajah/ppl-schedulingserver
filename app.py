@@ -42,10 +42,16 @@ def create_list_of_events(student_data = None, lecturer_data = None):
         print('wait')
         return 1
         # process the data
+        # # Assign()
+        # Genetic()
+        # Genetic.init()
+        # Genetic.add(Assign.daftar_matkul_time)
+        # Genetic.run(100)
+        # Genetic.sort()
 
 class Scheduler(Resource):
     def post(self):
-        args = parser.parse_args(strict=True) 
+        args = parser.parse_args(strict=True)
         data_json = {}
         for k, v in args.items():
             if v is not None:
@@ -65,31 +71,39 @@ class Ruangan:
         self.jam_awal = jam_awal    #hapus
         self.jam_akhir = jam_akhir	#hapus
         self.hari = hari			#hapus
-		
 
-		
+
+
 class Mahasiswa:
 	def __init__(self, event, user_id, email, dosen):
 		self.event = event
 		self.user_id = user_id
 		self.email = email
 		self.dosen = dosen
-	
-	
+
+
 class Dosen:
 	def __init__(self, event, user_id, email):
 		self.event = event
 		self.user_id = user_id
 		self.email = email
 
-		
+
 class Event:
-	def __init__(self, name, date_start, date_end):
+	def __init__(self, name, event_id, date_start, date_end):
+        self.event_id = event_id
 		self.name = name
 		self.date_start = date_start
 		self.date_end = date_end
-		
 
+class Session:
+    def __init__(self, session_id, name, student_id, lecturers_id, date_start, date_end):
+        self.session_id = session_id
+        self.name = name
+        self.student_id = student_id
+        self.lecturers_id = lecturers_id
+        self.data_start = date_start
+        self.data_end = date_end
 
 class Genetic:
     inputs = []
@@ -266,8 +280,8 @@ class Genetic:
                     fitness_total[j], fitness_total[j+1] = fitness_total[j+1], fitness_total[j]
                     self.result[j], self.result[j+1] = self.result[j+1], self.result[j]
 
-					
-					
+
+
 class Matriks:
     row = 0
     col = 0
@@ -296,8 +310,8 @@ class Matriks:
     def __str__(self):
         return (str(self.row) + ' ' + str(self.col) + ' ' + str(self.matriks))
 
-		
-		
+
+
 class MatKulOnlyTime:
     def __init__(self, idmatkul):
         self.idmatkul = idmatkul
@@ -315,8 +329,8 @@ class MatKulOnlyTime:
     def __str__(self):
         return "Ruang : " + str(self.r_selected) + '\nHari : ' + str(self.h_selected) + '\nJam Mulai : ' + str(self.j_selected) + '\nSKS : ' + str(self.sks)
 
-		
-		
+
+
 class MatKul:
     def __init__(self, idmatkul, nama, ruangan, awal, akhir, sks, hari):
         self.idmatkul = idmatkul
@@ -327,8 +341,8 @@ class MatKul:
         self.sks = sks
         self.hari = hari
 
-		
-		
+
+
 class Jadwal:
     daftar_ruangan = []
     daftar_mata_kuliah = []
@@ -392,8 +406,8 @@ class Jadwal:
         self.daftar_mata_kuliah = []
         self.init_file(nama_file)
 
-		
-		
+
+
 class Assign:
 	daftar_matkul_time = []
 
@@ -514,7 +528,7 @@ class Assign:
 
 api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
 api.add_resource(Home, '/', endpoint = "home")
-	
+
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
 
