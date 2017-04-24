@@ -21,6 +21,7 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('student_data', type=str, required=False, help='please input student data (json)', location='json')
 parser.add_argument('lecturer_data', type=str, required=False, help='please input lecturer data (json)', location='json')
+parser.add_argument('data', type=str, required=False, help='need entire data', location='json')
 
 class Home(Resource):
     def post(self):
@@ -47,7 +48,7 @@ def student_data_parser(student_data):
         try:
             event_json = temp_student_data['event']
         except:
-            print('Event kosong')
+            print("Event kosong")
         if event_json is not None:
             for j in event_json:
                 temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
@@ -75,7 +76,7 @@ def lecturer_data_parser(lecturer_data):
         try:
             event_json = temp_lecturer_data['event']
         except:
-            print('Event kosong')
+            print("Event kosong")
         if event_json is not None:
             for j in event_json:
                 temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
@@ -92,7 +93,7 @@ def create_sessions(students_list = None, lecturers_list = None):
 
 def create_initial_data(temp_data = None):
     if temp_data is None:
-        print ('We need both of student and lecturer data to proceed')
+        print ("We need both of student and lecturer data to proceed")
     else:
         # create dictionary of lists
         data = {}
@@ -107,31 +108,31 @@ def create_initial_data(temp_data = None):
         # Genetic.add(Assign.daftar_matkul_time)
         # Genetic.run(100)
         # Genetic.sort()
-		
-def get_year():
-	now = datetime.datetime.now()
-	return now.year
-	
-def cetak_nomor_hari():
-	print ("[", end='')
-	for i in range (1, 365):
-		print (i, end='')
-		print(", ", end='')
-	print (365, end='')
-	x = get_year()
-	if (calendar.isleap(x)):
-		print (", 366", end='')
-	print ("]")
-	return
-	
-def number_to_date(x):
-	year = get_year()
-	date = datetime.datetime(year, 1, 1) + datetime.timedelta(x - 1)
-	return date
-	
-def date_to_day(date):
-	day_name = date.strftime("%A")
-	return day_name
+# 		
+# def get_year():
+# 	now = datetime.datetime.now()
+# 	return now.year
+#
+# def cetak_nomor_hari():
+# 	print ("[", end='')
+# 	for i in range (1, 365):
+# 		print (i, end='')
+# 		print(", ", end='')
+# 	print (365, end='')
+# 	x = get_year()
+# 	if (calendar.isleap(x)):
+# 		print (", 366", end='')
+# 	print ("]")
+# 	return
+#
+# def number_to_date(x):
+# 	year = get_year()
+# 	date = datetime.datetime(year, 1, 1) + datetime.timedelta(x - 1)
+# 	return date
+#
+# def date_to_day(date):
+# 	day_name = date.strftime("%A")
+# 	return day_name
 
 class Data():
     def __init__(self, students=None, lecturers=None, sessions=None):
@@ -208,6 +209,7 @@ class Session(object):
         self.lecturers_id = lecturers_id
         self.list_of_event = events
         self.list_of_day = days
+        self.room
 
 class Genetic:
     inputs = []
