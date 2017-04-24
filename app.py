@@ -141,6 +141,79 @@ class Data():
         self.sessions = sessions
 
 class Scheduler(Resource):
+    def get(self):
+        data = [{
+            "id": "87623",
+            "nama": "Sidang si A",
+            "ruang": "7602",
+            "start_date": "2017-05-01 07:00:00",
+            "end_date": "2017-05-01 08:00:00"
+        },
+            {
+                "id": "87624",
+                "nama": "Sidang si B",
+                "ruang": "7606",
+                "start_date": "2017-05-01 07:00:00",
+                "end_date": "2017-05-01 08:00:00"
+            },
+            {
+                "id": "87625",
+                "nama": "Sidang si C",
+                "ruang": "7602",
+                "start_date": "2017-05-01 08:00:00",
+                "end_date": "2017-05-01 09:00:00"
+            },
+            {
+                "id": "87626",
+                "nama": "Sidang si D",
+                "ruang": "7602",
+                "start_date": "2017-05-01 09:00:00",
+                "end_date": "2017-05-01 10:00:00"
+            },
+            {
+                "id": "87627",
+                "nama": "Sidang si E",
+                "ruang": "7606",
+                "start_date": "2017-05-01 08:00:00",
+                "end_date": "2017-05-01 09:00:00"
+            },
+            {
+                "id": "87628",
+                "nama": "Sidang si F",
+                "ruang": "7606",
+                "start_date": "2017-05-01 09:00:00",
+                "end_date": "2017-05-01 10:00:00"
+            },
+            {
+                "id": "87629",
+                "nama": "Sidang si G",
+                "ruang": "7602",
+                "start_date": "2017-05-02 07:00:00",
+                "end_date": "2017-05-02 08:00:00"
+            },
+            {
+                "id": "87630",
+                "nama": "Sidang si H",
+                "ruang": "7602",
+                "start_date": "2017-05-02 09:00:00",
+                "end_date": "2017-05-02 10:00:00"
+            },
+            {
+                "id": "87631",
+                "nama": "Sidang si I",
+                "ruang": "7606",
+                "start_date": "2017-05-02 07:00:00",
+                "end_date": "2017-05-02 08:00:00"
+            },
+            {
+                "id": "87632",
+                "nama": "Sidang si J",
+                "ruang": "7606",
+                "start_date": "2017-05-01 08:00:00",
+                "end_date": "2017-05-01 09:00:00"
+            }
+        ]
+        return jsonify({"result": data})
     def post(self):
         # args = parser.parse_args(strict=True)
         # data_json = {}
