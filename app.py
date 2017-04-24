@@ -75,26 +75,26 @@ class Ruangan:
 
 
 class Mahasiswa:
-	def __init__(self, event, user_id, email, dosen):
-		self.event = event
-		self.user_id = user_id
-		self.email = email
-		self.dosen = dosen
+    def __init__(self, event, user_id, email, dosen):
+        self.event = event
+        self.user_id = user_id
+        self.email = email
+        self.dosen = dosen
 
 
 class Dosen:
-	def __init__(self, event, user_id, email):
-		self.event = event
-		self.user_id = user_id
-		self.email = email
+    def __init__(self, event, user_id, email):
+        self.event = event
+        self.user_id = user_id
+        self.email = email
 
 
 class Event:
-	def __init__(self, name, event_id, date_start, date_end):
-        self.event_id = event_id
-		self.name = name
-		self.date_start = date_start
-		self.date_end = date_end
+    def __init__(self, name, event_id, date_start, date_end):
+        self.name = name
+        self.event_id
+        self.date_start
+        self.data_end
 
 class Session:
     def __init__(self, session_id, name, student_id, lecturers_id, date_start, date_end):
