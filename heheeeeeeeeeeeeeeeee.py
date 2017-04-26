@@ -1,10 +1,10 @@
 # LIBRARY
+from __future__ import division
 import calendar
 import date
 import datetime
 import os
 import time
-from __future__ import division
 from copy import deepcopy
 from math import ceil, exp, floor
 from random import randint, seed, shuffle
@@ -22,7 +22,7 @@ def longtoDate(date):
 # STRUKTUR DATA
 class Event(object):
 # kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
-    def __init__(self, event_id = None, name = None, date_start = None, date_end = None):
+    def __init__(self, event_id = None, name = None, date_start = '2000-05-01 07:00:00', date_end = '2000-05-01 07:00:05'):
         self.event_id = event_id
         self.name = name
         self.date_start = date_start
@@ -87,9 +87,9 @@ def isEventConflict(candidateEvent, event):
 # cek apakah event 1 (candidateEvent) dengan event 2 (event) bentrok
     if (event.long_start >= candidateEvent.long_start and event.long_start <= candidateEvent.long_end):
         return True # bentrok, dosen bakal cabut atau ruangan bakal dipake ditengah
-    else if (event.long_end >= candidateEvent.long_start and event.long_end <= candidateEvent.long_end):
+    elif (event.long_end >= candidateEvent.long_start and event.long_end <= candidateEvent.long_end):
         return True # bentrok, dosen bakal telat atau ruangan baru bisa dipake ditengah
-    else if (event.long_start <= candidateEvent.long_start and event.long_end >= candidateEvent.long_end):
+    elif (event.long_start <= candidateEvent.long_start and event.long_end >= candidateEvent.long_end):
         return True # bentrok, dosen gabakal dateng atau ruangan full gabisa dipake
     else:
         return False
@@ -97,7 +97,7 @@ def isEventConflict(candidateEvent, event):
 # STRUKTUR DATA
 class Sidang(object):
 # class Sidang sebagai variable dalam genetic algorithm
-    def __init__(self, student_id = None, lecturers_id):
+    def __init__(self, student_id = None, lecturers_id = None):
         self.lecturers_id = lecturers_id
         self.events = []
         self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
@@ -118,15 +118,15 @@ class Sidang(object):
             for lecturer_event in self.events:
                 if (isEventConflict(candidateEvent, lecturer_event)):
                     break # bentrok, cari waktu lain
-                else if (lecturer_event.long_start >= candidateEvent.long_end): # semua dosen available
+                elif (lecturer_event.long_start >= candidateEvent.long_end): # semua dosen available
                     # cek ruangan mana saja yang sedang kosong
                     for room in rooms_list:
                         for room_event in room.events:
                             if (isEventConflict(candidateEvent, room_event)):
                                 break # bentrok, cari ruangan lain
-                            else if (room_event.long_start >= candidateEvent.long_end): # ruangan kosong
+                            elif (room_event.long_start >= candidateEvent.long_end): # ruangan kosong
                                 self.domains.append(Domain(room.room_id, candidateEvent))
-                                idxDomain++
+                                idxDomain = idxDomain + 1
                                 break # dapat 1 kemungkinan ruang&jadwal, cari ruangan lain
             i += hourToSecond # cek jadwal 1 jam berikutnya
 
@@ -181,7 +181,7 @@ def GeneticAlgorithm(maxGeneration):
             # hitung berapa student yang konflik, fitnessnya makin kecil makin bagus
             fitness.append(countDomainConflicts())
             if fitness[i] == 0:
-                print "SOLUSI DITEMUKAN DALAM GENERASI", generation
+                print ("SOLUSI DITEMUKAN DALAM GENERASI", generation)
                 return
         # masih ada konflik di semua gen, cari gen terjelek dan terbagus
         idxMin = fitness.index(max(fitness))
@@ -193,7 +193,7 @@ def GeneticAlgorithm(maxGeneration):
             for i in range(len(listGen[idxMax])):
                 students_list[i].idxDomain = listGen[idxMax][i]
             # cetak berapa konflik
-            print fitness[idxMax], "KONFLIK DALAM GENERASI", generation
+            print (fitness[idxMax], "KONFLIK DALAM GENERASI", generation)
             break # break while True
         # lanjut ke generation selanjutnya
         else:
@@ -326,7 +326,8 @@ class Data():
         self.lecturers = lecturers
         self.sidangs = sidangs
 
-class Scheduler(Resource):
+# class Scheduler(Resource):
+class Scheduler():
     def post(self):
         args = parser.parse_args(strict=True)
         data_json = {}
