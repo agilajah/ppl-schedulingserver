@@ -1,10 +1,10 @@
 # LIBRARY
+from __future__ import division
 import calendar
 import date
 import datetime
 import os
 import time
-from __future__ import division
 from copy import deepcopy
 from math import ceil, exp, floor
 from random import randint, seed, shuffle
@@ -22,7 +22,7 @@ def longtoDate(date):
 # STRUKTUR DATA
 class Event(object):
 # kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
-    def __init__(self, event_id = None, name = None, date_start = None, date_end = None):
+    def __init__(self, event_id = None, name = None, date_start = '2000-05-01 07:00:00', date_end = '2000-05-01 07:00:05'):
         self.event_id = event_id
         self.name = name
         self.date_start = date_start
@@ -98,9 +98,9 @@ def isConflict(domain, event):
 # cek apakah event 1 (domain) dengan event 2 (event) bentrok
     if (event.long_start >= domain.long_start and event.long_start <= domain.long_end):
         return True # bentrok, dosen bakal cabut atau ruangan bakal dipake ditengah
-    else if (event.long_end >= domain.long_start and event.long_end <= domain.long_end):
+    elif (event.long_end >= domain.long_start and event.long_end <= domain.long_end):
         return True # bentrok, dosen bakal telat atau ruangan baru bisa dipake ditengah
-    else if (event.long_start <= domain.long_start and event.long_end >= domain.long_end):
+    elif (event.long_start <= domain.long_start and event.long_end >= domain.long_end):
         return True # bentrok, dosen gabakal dateng atau ruangan full gabisa dipake
     else:
         return False
@@ -108,7 +108,7 @@ def isConflict(domain, event):
 # STRUKTUR DATA
 class Sidang(object):
 # class Sidang sebagai variable dalam genetic algorithm
-    def __init__(self, student_id = None, lecturers_id):
+    def __init__(self, student_id = None, lecturers_id = None):
         self.lecturers_id = lecturers_id
         self.events = []
         self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
@@ -128,15 +128,15 @@ class Sidang(object):
             for event in self.events:
                 if (isConflict(domain, event)):
                     break # bentrok, cari waktu lain
-                else if (event.long_start >= domain.long_end): # semua dosen available
+                elif (event.long_start >= domain.long_end): # semua dosen available
                     # cek ruangan mana saja yang sedang kosong
                     for room in rooms_list:
                         for room_event in room.events:
                             if (isConflict(domain, room_event)):
                                 break # bentrok, cari ruangan lain
-                            else if (event.long_start >= domain.long_end): # ruangan kosong
+                            elif (event.long_start >= domain.long_end): # ruangan kosong
                                 self.domains.append(Domain(room.room_id, domain))
-                                idxDomain++
+                                idxDomain = idxDomain + 1
                                 break # dapat 1 kemungkinan ruang&jadwal, cari ruangan lain
             i += hourToSecond # cek jadwal selanjutnya tiap 1 jam
 
@@ -261,7 +261,8 @@ class Data():
         self.lecturers = lecturers
         self.sidangs = sidangs
 
-class Scheduler(Resource):
+# class Scheduler(Resource):
+class Scheduler():
     def post(self):
         args = parser.parse_args(strict=True)
         data_json = {}
