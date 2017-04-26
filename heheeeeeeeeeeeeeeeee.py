@@ -113,7 +113,7 @@ class Sidang(object):
     def searchDomains(self):
         i = sidang_period.long_start
         while (i < sidang_period.long_end):
-            candidateEvent = Event('Usulan sidang ' . student_id, longtoDate(i), longtoDate(i + hourToSecond))
+            candidateEvent = Event('Usulan sidang ' + student_id, longtoDate(i), longtoDate(i + hourToSecond))
             # cek apakah dosen ada yang sedang sibuk
             for lecturer_event in self.events:
                 if (isEventConflict(candidateEvent, lecturer_event)):
@@ -236,6 +236,23 @@ def execGA(object):
     geneticAlgorithm(20)
     printResult()
 
+# MAIN PROGRAM
+# setelah data-data di load dari json jadi objek (gak ngerti gimana caranya), tinggal uncomment dibawah ini
+# execGA()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -258,38 +275,23 @@ def student_data_parser(student_data):
     students = []
     for i in student_data:
         temp_student_data = student_data[i]
-        temp_student = Mahasiswa()
-        temp_student.user_id = temp_student_data['user_id']
-        temp_student.dosen_pembimbing_id = temp_student_data['id_dosen_pembimbing']
-        temp_student.first_name = temp_student_data['user_name']
-        temp_student.last_name = temp_student_data['last_name']
+        temp_student = Student()
+        temp_student.student_id = temp_student_data['user_id']
+        temp_student.name = temp_student_data['user_name'] + temp_student_data['last_name']
         temp_student.email = temp_student_data['email']
-        temp_student.topics = temp_student_data['topics']
-        list_of_events = []
-        # create event
-        try:
-            event_json = temp_student_data['event']
-        except:
-            print('Event kosong')
-        if event_json is not None:
-            for j in event_json:
-                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
-                    event_json[j].date_end)
-                list_of_events.append(temp_event)
-
+        temp_student.topic = temp_student_data['topics']
+        temp_student.dosbing_id = temp_student_data['id_dosen_pembimbing']
         # now we append all of those information here
         students.append(temp_student)
-
     return students
 
 def lecturer_data_parser(lecturer_data):
     lecturers = []
     for i in lecturer_data:
         temp_lecturer_data = lecturer_data[i]
-        temp_lecturer = Dosen()
-        temp_lecturer.user_id = temp_lecturer_data['user_id']
-        temp_lecturer.first_name = temp_lecturer_data['user_name']
-        temp_lecturer.last_name = temp_lecturer_data['last_name']
+        temp_lecturer = Lecturer()
+        temp_lecturer.lecturer_id = temp_lecturer_data['user_id']
+        temp_lecturer.name = temp_lecturer_data['user_name'] + temp_lecturer_data['last_name']
         temp_lecturer.email = temp_lecturer_data['email']
         temp_lecturer.topics = temp_lecturer_data['topics']
         list_of_events = []
@@ -303,14 +305,10 @@ def lecturer_data_parser(lecturer_data):
                 temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
                                    event_json[j].date_end)
                 list_of_events.append(temp_event)
-
+        temp_lecturer.events = list_of_events
         # now we append all of those information here
         lecturers.append(temp_lecturer)
-
     return lecturers
-
-def create_sessions(students_list = None, lecturers_list = None):
-    return 0
 
 def create_initial_data(temp_data = None):
     if temp_data is None:
@@ -321,33 +319,6 @@ def create_initial_data(temp_data = None):
         data['students_list'] = student_data_parser(temp_data['student_data'])
         data['lecturers_list'] = lecturer_data_parser(temp_data['lecturer_data'])
         data['rooms_list'] = room_data_parser(temp_data['room_data'])
-        # create session from given students and lecturers list
-        data['sessions_list'] = create_sessions(data['students_list'], data['lecturers_list'])
-        
-def get_year():
-    now = datetime.datetime.now()
-    return now.year
-    
-def cetak_nomor_hari():
-    print ("[", end='')
-    for i in range (1, 365):
-        print (i, end='')
-        print(", ", end='')
-    print (365, end='')
-    x = get_year()
-    if (calendar.isleap(x)):
-        print (", 366", end='')
-    print ("]")
-    return
-    
-def number_to_date(x):
-    year = get_year()
-    date = datetime.datetime(year, 1, 1) + datetime.timedelta(x - 1)
-    return date
-    
-def date_to_day(date):
-    day_name = date.strftime("%A")
-    return day_name
 
 class Data():
     def __init__(self, students=None, lecturers=None, sidangs=None):
@@ -362,7 +333,6 @@ class Scheduler(Resource):
         for k, v in args.items():
             if v is not None:
                 data_json[k] = v
-
         temp_data = json.load(data_json)
         # student_data = temp_data['student_data']
         # lecturer_data = temp_data['lecturer_data']
@@ -371,6 +341,4 @@ class Scheduler(Resource):
         # the result is dictionary of lists
         result_data = create_initial_data(temp_data)
         #create data object
-
         return 1
-
