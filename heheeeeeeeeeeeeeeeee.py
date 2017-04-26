@@ -38,8 +38,6 @@ def getEventKey(event):
 
 # VARIABLE GLOBAL
 sidang_period = Event('Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
-sidang_period_days = 12 # ini hardcode, samain dengan sidang_period
-workHours = 11 # konstanta, 1 hari ada 11 jam pelajaran
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
@@ -65,7 +63,6 @@ class Room(object):
         self.events = events # jadwal ruangan sedang dipakai
         self.addClosedSchedule() # generate jadwal ruangan tutup
         self.events.sort(key = getEventKey)
-        self.table = []
     def addClosedSchedule(self):
         i = sidang_period.long_start # hanya generate di masa sidang, tidak setahun penuh
         while (i < sidang_period.long_end):
@@ -75,11 +72,8 @@ class Room(object):
                 self.events.append(Event('Libur', longtoDate(i), longtoDate(i + dayToSecond)))
             else: # hari senin sampe jumat
                 # ruangan tutup dari jam 6 sore sampe jam 7 besoknya
-                self.events.append(Event('Tutup', longtoDate(i + (hourToSecond * workHours)), longtoDate(i + dayToSecond)))
+                self.events.append(Event('Tutup', longtoDate(i + (hourToSecond * 11)), longtoDate(i + dayToSecond)))
             i += dayToSecond
-    def initTable(self):
-        for i in range(workHours):
-            self.table.append([[]] * sidang_period_days)
 
 # STRUKTUR DATA
 class Domain(object):
@@ -134,7 +128,7 @@ class Sidang(object):
                                 self.domains.append(Domain(room.room_id, candidateEvent))
                                 idxDomain = idxDomain + 1
                                 break # dapat 1 kemungkinan ruang&jadwal, cari ruangan lain
-            i += hourToSecond # cek jadwal selanjutnya tiap 1 jam
+            i += hourToSecond # cek jadwal 1 jam berikutnya
 
 # STRUKTUR DATA
 class Student(object):
@@ -147,9 +141,6 @@ class Student(object):
         self.topic = topic
         self.dosbing_id = dosbing_id
         self.sidang = Sidang(self.student_id, dosbing_id) # harusnya gak cuma dosbing, tapi semua dosen yg hadir
-
-# VARiABLE GLOBAL
-listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list of idxDomain (elemennya sebanyak students_list)
 
 # FUNGSI
 def isDomainConflict(domain1, domain2):
@@ -172,11 +163,14 @@ def countDomainConflicts(object):
                 result += isDomainConflict(domain1, domain2)
     return result
 
+# VARiABLE GLOBAL
+listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list of idxDomain (elemennya sebanyak students_list)
+
 # FUNGSI
-def GeneticAlgorithm(generasi):
+def GeneticAlgorithm(maxGeneration):
 # implementasi genetic algorithm
     fitness = [] # score fitness untuk tiap gen
-    keturunan = 0
+    generation = 0
     while True:
         # hitung fitness tiap gen
         del fitness[:]
@@ -187,20 +181,21 @@ def GeneticAlgorithm(generasi):
             # hitung berapa student yang konflik, fitnessnya makin kecil makin bagus
             fitness.append(countDomainConflicts())
             if fitness[i] == 0:
-                print ("SOLUSI DITEMUKAN DALAM GENERASI", keturunan)
+                print ("SOLUSI DITEMUKAN DALAM GENERASI", generation)
                 return
         # masih ada konflik di semua gen, cari gen terjelek dan terbagus
         idxMin = fitness.index(max(fitness))
         idxMax = fitness.index(min(fitness))
-        keturunan += 1
-        # gak nemu solusi sampai keturunan ke-generasi
-        if keturunan == generasi:
+        generation += 1
+        # gak nemu solusi sampai generation ke-maxGeneration
+        if generation == maxGeneration:
             # pasangkan lagi student dengan domain kepunyaan gen terbaik (fitness terkecil)
             for i in range(len(listGen[idxMax])):
                 students_list[i].idxDomain = listGen[idxMax][i]
             # cetak berapa konflik
-            print (fitness[idxMax], "KONFLIK DALAM GENERASI", keturunan)
+            print (fitness[idxMax], "KONFLIK DALAM GENERASI", generation)
             break # break while True
+        # lanjut ke generation selanjutnya
         else:
             # gen jelek timpa dengan gen bagus
             for i in range(len(students_list)):
@@ -212,7 +207,7 @@ def GeneticAlgorithm(generasi):
                 temp = listGen[0][i]
                 listGen[0][i] = listGen[1][i]
                 listGen[1][i] = temp
-                #swap gen 2 dengan 3
+                #swap gen 2 dengan gen 3
                 temp = listGen[2][i]
                 listGen[2][i] = listGen[3][i]
                 listGen[3][i] = temp
@@ -228,7 +223,7 @@ def printResult(object):
     for student in students_list:
         idxDomain = student.sidang.idxDomain
         domain = student.sidang.domains[idxDomain]
-        print (student.student_id, ' ', domain.event.date_start, ' ', rooms_list[domain.room_id])
+        print (student.student_id, ' pada ', domain.event.date_start, ' di ', rooms_list[domain.room_id].name)
 
 # FUNGSI
 def execGA(object):
