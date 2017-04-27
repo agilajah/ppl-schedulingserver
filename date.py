@@ -26,8 +26,8 @@ def date_to_day(date):
 	day_name = date.strftime("%A")
 	return day_name
 
-print (get_year())
-cetak_nomor_hari()
-x = number_to_date(5)
-print (x)
-print (date_to_day(x))
+# print (get_year())
+# cetak_nomor_hari()
+# x = number_to_date(5)
+# print (x)
+# print (date_to_day(x))
