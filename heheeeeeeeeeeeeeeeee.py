@@ -114,7 +114,7 @@ class Sidang(object):
     def searchDomains(self):
         i = sidang_period.long_start
         while (i < sidang_period.long_end):
-            candidateEvent = Event(9090, 'Usulan sidang ' + student_id, longtoDate(i), longtoDate(i + hourToSecond))
+            candidateEvent = Event(9090, 'Usulan sidang ' + str(self.student_id), longtoDate(i), longtoDate(i + hourToSecond))
             # cek apakah dosen ada yang sedang sibuk
             for lecturer_event in self.events:
                 if (isEventConflict(candidateEvent, lecturer_event)):

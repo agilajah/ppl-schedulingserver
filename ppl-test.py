@@ -115,6 +115,7 @@ def isEventConflict(candidateEvent, event):
 class Sidang(object):
 # class Sidang sebagai variable dalam genetic algorithm
     def __init__(self, student_id = None, lecturers_id = None):
+        self.student_id = student_id
         self.lecturers_id = lecturers_id
         self.events = []
         self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
@@ -129,7 +130,7 @@ class Sidang(object):
     def searchDomains(self):
         i = sidang_period.long_start
         while (i < sidang_period.long_end):
-            candidateEvent = Event('Usulan sidang ' + student_id, longtoDate(i), longtoDate(i + hourToSecond))
+            candidateEvent = Event('Usulan sidang ' + str(self.student_id), longtoDate(i), longtoDate(i + hourToSecond))
             # cek apakah dosen ada yang sedang sibuk
             for lecturer_event in self.events:
                 if (isEventConflict(candidateEvent, lecturer_event)):
