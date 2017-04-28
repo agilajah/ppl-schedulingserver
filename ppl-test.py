@@ -48,7 +48,10 @@ def getEventKey(event):
     return event.long_start
 
 # VARIABLE GLOBAL
-sidang_period = Event('Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+sidang_period = Event(1212, 'Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+print("tesst period")
+print(str(sidang_period.date_start))
+print(str(sidang_period.date_end))
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
@@ -76,8 +79,11 @@ class Room(object):
         #self.events.sort(key = getEventKey)
     def addClosedSchedule(self):
         i = sidang_period.long_start # hanya generate di masa sidang, tidak setahun penuh
+        print("dipanggil "+str(sidang_period.date_start))
+        print("sampe "+str(sidang_period.date_end))
         while (i < sidang_period.long_end):
             day = (i % weekToSecond) / dayToSecond
+            print("day "+str(day))
             if (day >= 2 and day < 4): # hari sabtu atau minggu
                 # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
                 self.events.append(Event('Libur', longtoDate(i), longtoDate(i + dayToSecond)))

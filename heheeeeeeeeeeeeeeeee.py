@@ -37,7 +37,7 @@ def getEventKey(event):
     return event.long_start
 
 # VARIABLE GLOBAL
-sidang_period = Event('Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+sidang_period = Event(1212, 'Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
@@ -69,10 +69,10 @@ class Room(object):
             day = (i % weekToSecond) / dayToSecond
             if (day >= 2 and day < 4): # hari sabtu atau minggu
                 # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
-                self.events.append(Event('Libur', longtoDate(i), longtoDate(i + dayToSecond)))
+                self.events.append(Event(444, 'Libur', longtoDate(i), longtoDate(i + dayToSecond)))
             else: # hari senin sampe jumat
                 # ruangan tutup dari jam 6 sore sampe jam 7 besoknya
-                self.events.append(Event('Tutup', longtoDate(i + (hourToSecond * 11)), longtoDate(i + dayToSecond)))
+                self.events.append(Event(555, 'Tutup', longtoDate(i + (hourToSecond * 11)), longtoDate(i + dayToSecond)))
             i += dayToSecond
 
 # STRUKTUR DATA
@@ -98,6 +98,7 @@ def isEventConflict(candidateEvent, event):
 class Sidang(object):
 # class Sidang sebagai variable dalam genetic algorithm
     def __init__(self, student_id = None, lecturers_id = None):
+        self.student_id = student_id
         self.lecturers_id = lecturers_id
         self.events = []
         self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
@@ -113,7 +114,7 @@ class Sidang(object):
     def searchDomains(self):
         i = sidang_period.long_start
         while (i < sidang_period.long_end):
-            candidateEvent = Event('Usulan sidang ' + student_id, longtoDate(i), longtoDate(i + hourToSecond))
+            candidateEvent = Event(9090, 'Usulan sidang ' + student_id, longtoDate(i), longtoDate(i + hourToSecond))
             # cek apakah dosen ada yang sedang sibuk
             for lecturer_event in self.events:
                 if (isEventConflict(candidateEvent, lecturer_event)):
@@ -302,7 +303,7 @@ def lecturer_data_parser(lecturer_data):
             print('Event kosong')
         if event_json is not None:
             for j in event_json:
-                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
+                temp_event = Event(678, event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
                                    event_json[j].date_end)
                 list_of_events.append(temp_event)
         temp_lecturer.events = list_of_events
