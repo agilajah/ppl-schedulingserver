@@ -9,58 +9,32 @@ import json
 import os
 import time
 
-# FUNGSI
-def dateToLong(date):
-# input string tanggal sesuai format google calendar, output long
-    return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
+######################################## STRUKTUR DATA ########################################
 
-# FUNGSI
-def longToDate(date):
-# input long, output string tanggal sesuai format google calendar
-    return datetime.datetime.fromtimestamp(date).strftime("%Y-%m-%d %H:%M:%S")
-
-# STRUKTUR DATA
 class Event():
 # kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
-    def __init__(self, event_id, name = 'An event', date_start = '', date_end= ''):
-        self.event_id = event_id
+    def __init__(self, eventID = None, name = 'An event', startDate = None, endDate = None):
+        self.eventID = eventID
         self.name = name
-        self.date_start = date_start
-        self.date_end = date_end
+        self.startDate = startDate
+        self.endDate = endDate
         # tipe waktu disimpan juga dalam tipe integer supaya lebih mudah cek lebih besar/kecil nya
-        self.long_start = dateToLong(date_start)
-        self.long_end = dateToLong(date_end)
+        self.startLong = dateToLong(startDate)
+        self.endLong = dateToLong(endDate)
 
-# VARIABLE GLOBAL
-sidang_period = Event(1212, 'Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
-hourToSecond = 3600 # konstanta
-dayToSecond = 86400 # konstanta
-weekToSecond = 604800 # konstanta
-
-# STRUKTUR DATA
-class Lecturer():
-# dosen
-    def __init__(self, lecturer_id, name = 'Foolan', email = 'foolan@gmail.com', topics = [], events = []):
-        self.lecturer_id = lecturer_id
-        self.name = name
-        self.email = email
-        self.topics = topics
-        self.events = events # jadwal sibuk dosen
-        self.events.sort(key = lambda event : event.long_start)
-
-# STRUKTUR DATA
 class Room():
 # ruangan
-    def __init__(self, room_id, name = 'A room', email = 'a_room@gmail.com', events = []):
-        self.room_id = room_id
+    def __init__(self, roomID = None, name = 'A room', email = 'a.room@gmail.com', events = []):
+        self.roomID = roomID
         self.name = name
         self.email = email
         self.events = events # jadwal ruangan sedang dipakai
         self.addClosedSchedule() # generate jadwal ruangan tutup
-        self.events.sort(key = lambda event : event.long_start)
+        self.events.sort(key = lambda event : event.startLong)
     def addClosedSchedule(self):
-        i = sidang_period.long_start # hanya generate di masa sidang, tidak setahun penuh
-        while (i < sidang_period.long_end):
+        # generate jam tutup dan jam libur ruangan di masa sidang
+        i = sidangPeriod.startLong
+        while (i < sidangPeriod.endLong):
             day = (i % weekToSecond) / dayToSecond
             if (day >= 2 and day < 4): # hari sabtu atau minggu
                 # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
@@ -70,102 +44,127 @@ class Room():
                 self.events.append(Event(None, 'Tutup', longToDate(i + (hourToSecond * 11)), longToDate(i + dayToSecond)))
             i += dayToSecond
 
-# STRUKTUR DATA
+class Lecturer():
+# dosen
+    def __init__(self, lecturerID = None, name = 'Foolan', email = 'foolan@gmail.com', topics = [], events = []):
+        self.lecturerID = lecturerID
+        self.name = name
+        self.email = email
+        self.topics = topics
+        self.events = events # jadwal sibuk dosen
+        self.events.sort(key = lambda event : event.startLong)
+
+class Student():
+# mahasiswa
+# asumsi: mahasiswa selalu siap sedia, tidak punya jadwal sibuk
+    def __init__(self, studentID = None, name = 'Foolan', email = 'foolan@gmail.com', topic = None, pembimbingID = [], pengujiID =[]):
+        self.studentID = studentID
+        self.name = name
+        self.email = email
+        self.topic = topic
+        self.pembimbingID = pembimbingID
+        self.pengujiID = pengujiID
+        self.sidang = Sidang(studentID, pembimbingID + pengujiID)
+
+class Sidang():
+# class Sidang sebagai variable dalam genetic algorithm
+    def __init__(self, studentID = None, lecturersID = []):
+        self.studentID = studentID
+        self.lecturersID = lecturersID
+        self.events = []
+        self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
+        self.events.sort(key = lambda event : event.startLong)
+        self.domains = [] # semua kemungkinan ruang&jadwal yang bisa digunakan
+        self.searchDomains()
+        self.totalDomain = len(self.domains)
+        self.idxDomain = -1 # hasil algoritma adalah ini, salah satu ruang&jadwal dari banyak kemungkinan tersebut
+    def mergeEventsLecturers(self):
+        for lecturerID in self.lecturersID:
+            # cari dosennya
+            lecturer = None
+            for lecturerIterator in listLecturer:
+                if (lecturerIterator.lecturerID == lecturerID):
+                    lecturer = lecturerIterator
+                    break
+            # gabung jadwalnya
+            if (lecturer is not None):
+                for event in lecturer.events:
+                    self.events.append(event) # gabunginnya satu satu biar gak jadi list of list
+    def searchDomains(self):
+        i = sidangPeriod.startLong
+        while (i < sidangPeriod.endLong):
+            candidateEvent = Event(None, 'Usulan sidang ' + str(self.studentID), longToDate(i), longToDate(i + hourToSecond))
+            # cek apakah dosen ada yang sedang sibuk
+            isConflict = False
+            for eventLecturer in self.events:
+                if (isEventConflict(candidateEvent, eventLecturer)):
+                    isConflict = True
+                    break # bentrok, cari waktu lain
+                if (eventLecturer.startLong >= candidateEvent.endLong):
+                    break # tidak perlu cek lagi event selanjutnya, pasti gak bentrok
+            if (not isConflict): # semua dosen bersedia
+                for room in listRoom:
+                    isConflict = False
+                    for eventRoom in room.events:
+                        if (isEventConflict(candidateEvent, eventRoom)):
+                            isConflict = True
+                            break # bentrok, cari ruangan lain
+                        if (eventRoom.startLong >= candidateEvent.endLong):
+                            break # tidak perlu cek lagi event selanjutnya, pasti gak bentrok
+                    if (not isConflict): # ruangan kosong
+                        self.domains.append(Domain(room.roomID, candidateEvent))
+            i += hourToSecond # cek jadwal 1 jam berikutnya
+
 class Domain():
 # class Domain sebagai domain dalam genetic algorithm
-    def __init__(self, room_id, event):
-        self.room_id = room_id
+    def __init__(self, roomID, event):
+        self.roomID = roomID
         self.event = event
 
-# FUNGSI
+######################################## PROSEDUR ########################################
+
+def dateToLong(date):
+# input string tanggal sesuai format google calendar, output long
+    return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
+
+def longToDate(date):
+# input long, output string tanggal sesuai format google calendar
+    return datetime.datetime.fromtimestamp(date).strftime("%Y-%m-%d %H:%M:%S")
+
 def isEventConflict(candidateEvent, event):
 # cek apakah event 1 (candidateEvent) dengan event 2 (event) bentrok
-    if (event.long_start >= candidateEvent.long_start and event.long_start < candidateEvent.long_end):
+    if (event.startLong >= candidateEvent.startLong and event.startLong < candidateEvent.endLong):
         return True # bentrok, dosen bakal cabut atau ruangan bakal dipake ditengah
-    elif (event.long_end > candidateEvent.long_start and event.long_end <= candidateEvent.long_end):
+    elif (event.endLong > candidateEvent.startLong and event.endLong <= candidateEvent.endLong):
         return True # bentrok, dosen bakal telat atau ruangan baru bisa dipake ditengah
-    elif (event.long_start <= candidateEvent.long_start and event.long_end >= candidateEvent.long_end):
+    elif (event.startLong <= candidateEvent.startLong and event.endLong >= candidateEvent.endLong):
         return True # bentrok, dosen gabakal dateng atau ruangan full gabisa dipake
     else:
         return False
 
-# STRUKTUR DATA
-class Sidang():
-# class Sidang sebagai variable dalam genetic algorithm
-    def __init__(self, student_id, lecturers_id = []):
-        self.student_id = student_id
-        self.lecturers_id = lecturers_id
-        self.events = []
-        self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
-        self.events.sort(key = lambda event : event.long_start)
-        self.domains = [] # semua kemungkinan ruang&jadwal yang bisa digunakan
-        self.idxDomain = -1 # hasil algoritma adalah ini, salah satu ruang&jadwal dari banyak kemungkinan tersebut
-        self.searchDomains()
-        self.totalDomain = self.idxDomain + 1
-    def mergeEventsLecturers(self):
-    	return
-        for lecturer_id in lecturers_id:
-            for event in lecturers_list[lecturer_id].events:
-                self.events.append(event) # gabunginnya satu satu biar gak jadi list of list
-    def searchDomains(self):
-        i = sidang_period.long_start
-        while (i < sidang_period.long_end):
-            candidateEvent = Event(None, 'Usulan sidang ' + str(self.student_id), longToDate(i), longToDate(i + hourToSecond))
-            # cek apakah dosen ada yang sedang sibuk
-            for lecturer_event in self.events:
-                if (isEventConflict(candidateEvent, lecturer_event)):
-                    break # bentrok, cari waktu lain
-                elif (lecturer_event.long_start >= candidateEvent.long_end): # semua dosen available
-                    # cek ruangan mana saja yang sedang kosong
-                    for room in rooms_list:
-                        for room_event in room.events:
-                            if (isEventConflict(candidateEvent, room_event)):
-                                break # bentrok, cari ruangan lain
-                            elif (room_event.long_start >= candidateEvent.long_end): # ruangan kosong
-                                self.domains.append(Domain(room.room_id, candidateEvent))
-                                self.idxDomain = self.idxDomain + 1
-                                break # dapat 1 kemungkinan ruang&jadwal, cari ruangan lain
-            i += hourToSecond # cek jadwal 1 jam berikutnya
-
-# STRUKTUR DATA
-class Student():
-# mahasiswa
-# asumsi: mahasiswa selalu siap sedia, tidak punya jadwal sibuk
-    def __init__(self, student_id, name = 'Foolan', email = 'foolan@gmail.com', topic = None, dosbing_id = None):
-        self.student_id = student_id
-        self.name = name
-        self.email = email
-        self.topic = topic
-        self.dosbing_id = dosbing_id
-        self.sidang = Sidang(student_id, dosbing_id) # harusnya gak cuma dosbing, tapi semua dosen yg hadir
-
-# FUNGSI
 def isDomainConflict(domain1, domain2):
 # cek apakah usulan sidang 1 (domain1) dengan usulan sidang 2 (domain2) bentrok
-    if ((domain1.room_id == domain2.room_id) and isEventConflict(domain1.event, domain2.event)):
+    if ((domain1.roomID == domain2.roomID) and isEventConflict(domain1.event, domain2.event)):
         return 1 # ruangan dan jamnya sama, berarti bentrok
     else:
         return 0
 
-# FUNGSI
 def countDomainConflicts():
 # menghitung berapa banyak mahasiswa yang bentrok jadwal sidangnya
     result = 0
-    for student1 in students_list:
-        for student2 in students_list:
+    for student1 in listStudent:
+        for student2 in listStudent:
             # cross, kalo sama diri sendiri ya ga diitung wkwk -_-
-            if (student1.student_id != student2.student_id):
+            if (student1.studentID != student2.studentID):
                 domain1 = student1.sidang.domains[student1.sidang.idxDomain]
                 domain2 = student2.sidang.domains[student2.sidang.idxDomain]
                 result += isDomainConflict(domain1, domain2)
     return result
 
-# VARiABLE GLOBAL
-listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list of idxDomain (elemennya sebanyak students_list)
-
-# FUNGSI
-def GeneticAlgorithm(maxGeneration):
+def geneticAlgorithm(maxGeneration):
 # implementasi genetic algorithm
+    global listGen
+    global listStudent
     fitness = [] # score fitness untuk tiap gen
     generation = 0
     while True:
@@ -174,32 +173,32 @@ def GeneticAlgorithm(maxGeneration):
         for i in range(len(listGen)):
             # pasangkan dulu student dengan domain sesuai dengan yang ada pada gen
             for j in range(len(listGen[i])):
-                students_list[j].idxDomain = listGen[i][j]
+                listStudent[j].sidang.idxDomain = listGen[i][j]
             # hitung berapa student yang konflik, fitnessnya makin kecil makin bagus
             fitness.append(countDomainConflicts())
             if fitness[i] == 0:
-                print ("SOLUSI DITEMUKAN DALAM GENERASI", generation)
+                print "Solusi ditemukan dalam generasi ke", generation, ":"
                 return
         # masih ada konflik di semua gen, cari gen terjelek dan terbagus
         idxMin = fitness.index(max(fitness))
         idxMax = fitness.index(min(fitness))
         generation += 1
+        print "Ada", fitness[idxMax], "konflik dalam generasi ke", generation
         # gak nemu solusi sampai generation ke-maxGeneration
         if generation == maxGeneration:
             # pasangkan lagi student dengan domain kepunyaan gen terbaik (fitness terkecil)
             for i in range(len(listGen[idxMax])):
-                students_list[i].idxDomain = listGen[idxMax][i]
+                listStudent[i].sidang.idxDomain = listGen[idxMax][i]
             # cetak berapa konflik
-            print (fitness[idxMax], "KONFLIK DALAM GENERASI", generation)
             break # break while True
         # lanjut ke generation selanjutnya
         else:
             # gen jelek timpa dengan gen bagus
-            for i in range(len(students_list)):
+            for i in range(len(listStudent)):
                 listGen[idxMin][i] = listGen[idxMax][i]
             # kawin silang TANPA mutasi, mulai dari idxBelah (random) sampai index terakhir
-            idxBelah = random.randint(1, len(students_list) - 2)
-            for i in range(idxBelah, len(students_list)):
+            idxBelah = randint(1, len(listStudent) - 2)
+            for i in range(idxBelah, len(listStudent)):
                 #swap gen 0 dengan gen 1
                 temp = listGen[0][i]
                 listGen[0][i] = listGen[1][i]
@@ -210,98 +209,126 @@ def GeneticAlgorithm(maxGeneration):
                 listGen[3][i] = temp
             # mutasi = student ke-studentMutasi setiap gen, domainnya berubah menjadi domainMutasi
             for gen in listGen:
-                studentMutasi = random.randint(0, len(students_list) - 1)
-                domainMutasi = random.randint(0, students_list[studentMutasi].totalDomain - 1)
+                studentMutasi = randint(0, len(listStudent) - 1)
+                domainMutasi = randint(0, listStudent[studentMutasi].sidang.totalDomain - 1)
                 gen[studentMutasi] = domainMutasi
 
-# FUNGSI
 def printResult():
 # mencetak usulan jadwal sidang
-    for student in students_list:
+    global listStudent
+    listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
+    listResult = []
+    for student in listStudent:
         idxDomain = student.sidang.idxDomain
         domain = student.sidang.domains[idxDomain]
-        print (student.student_id, ' pada ', domain.event.date_start, ' di ', rooms_list[domain.room_id].name)
+        # cari ruangan
+        room = None
+        for roomIterator in listRoom:
+            if (roomIterator.roomID == domain.roomID):
+                room = roomIterator
+                break
+        # cetak ke layar
+        print '   ', domain.event.startDate, 'di', room.name, ':', student.name
+        # data untuk cetak ke file
+        result = {}
+        result.update({"studentID" : student.studentID})
+        result.update({"pembimbingID" : student.pembimbingID})
+        result.update({"pengujiID" : student.pengujiID})
+        result.update({"roomID" : room.roomID})
+        result.update({"start" : domain.event.startDate})
+        result.update({"end" : domain.event.endDate})
+        listResult.append(result)
+    # cetak ke file
+    with open('result.json', 'w') as outfile:
+        json.dump(listResult, outfile)
 
-# FUNGSI
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
-    for gen in listGen:
-        del gen[:]
+    global listGen
+    for i in range(len(listGen)):
+        del listGen[i][:]
         # inisialisasi, untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
-        for student in students_list:
-            gen.append(random.randint(0, student.sidang.totalDomain - 1))
+        for student in listStudent:
+            listGen[i].append(randint(0, student.sidang.totalDomain - 1))
     geneticAlgorithm(20)
     printResult()
 
 def studentParser(unparsedStudents):
-    students_list = []
+    global listStudent
     for unparsedStudent in unparsedStudents:
-        student_id = unparsedStudent['user_id']
-        name = unparsedStudent['name']['first'] + unparsedStudent['name']['last']
+        studentID = unparsedStudent['studentID']
+        name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
         email = unparsedStudent['email']
-        topic = unparsedStudent['topic']
-        dosbing_id = unparsedStudent['dosbing_id']
+        topic = unparsedStudent['topics']
+        pembimbingID = unparsedStudent['pembimbingID']
+        pengujiID = unparsedStudent['pengujiID']
         # now we append all of those information here
-        students_list.append(Student(student_id, name, email, topic, dosbing_id))
-    return students_list
+        listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
 
 def lecturerParser(unparsedLecturers):
-    lecturers_list = []
+    global listLecturer
     for unparsedLecturer in unparsedLecturers:
-        lecturer_id = unparsedLecturer['user_id']
-        name = unparsedLecturer['name']['first'] + unparsedLecturer['name']['last']
+        lecturerID = unparsedLecturer['lecturerID']
+        name = unparsedLecturer['name']['first'] + ' ' + unparsedLecturer['name']['last']
         email = unparsedLecturer['email']
-        topics = unparsedLecturer['topic']
+        topics = unparsedLecturer['topics']
         events = []
         # create event
         try:
-            listEventData = unparsedLecturer['event']
+            listEventData = unparsedLecturer['events']
         except:
-            print('Event kosong')
+            print('No event')
         if listEventData is not None:
             for eventData in listEventData:
-                event_start = eventData['start_date']
-                event_end = eventData['end_date']
+                start = eventData['start']
+                end = eventData['end']
                 # now we append all of those information event here
-                events.append(Event(None, None, event_start, event_end))
+                events.append(Event(None, 'Sibuk', start, end))
         # now we append all of those information here
-        lecturers_list.append(Lecturer(lecturer_id, name, email, topics, events))
-    return lecturers_list
+        listLecturer.append(Lecturer(lecturerID, name, email, topics, events))
 
 def roomParser(unparsedRooms):
-    rooms_list = []
+    global listRoom
     for unparsedRoom in unparsedRooms:
-        room_id = unparsedRoom['user_id']
-        name = unparsedRoom['name']['first'] + unparsedRoom['name']['last']
+        roomID = unparsedRoom['roomID']
+        name = unparsedRoom['name']
         email = unparsedRoom['email']
         events = []
         # create event
         try:
-            listEventData = unparsedRoom['event']
+            listEventData = unparsedRoom['events']
         except:
-            print('Event kosong')
+            print('No event')
         if listEventData is not None:
             for eventData in listEventData:
-                event_start = eventData['start_date']
-                event_end = eventData['end_date']
+                start = eventData['start']
+                end = eventData['end']
                 # now we append all of those information event here
-                events.append(Event(None, None, event_start, event_end))
+                events.append(Event(None, 'Dipakai', start, end))
         # now we append all of those information here
-        rooms_list.append(Room(room_id, name, email, events))
-    return rooms_list
+        listRoom.append(Room(roomID, name, email, events))
 
 def initData():
-    global students_list
-    global lecturers_list
-    global rooms_list
     # ambil data dari json
     with open('data.json') as rawData:
         unparsedData = json.load(rawData)
     # parse data
-    students_list = studentParser(unparsedData['student_data'])
-    lecturers_list = lecturerParser(unparsedData['lecturer_data'])
-    # rooms_list = roomParser(unparsedData['room_data'])
+    roomParser(unparsedData['listRoom'])
+    lecturerParser(unparsedData['listLecturer'])
+    studentParser(unparsedData['listStudent'])
 
-# MAIN PROGRAM
+######################################## VARIABLE ########################################
+
+sidangPeriod = Event(None, 'Masa Sidang', '2017-05-01 07:00:00', '2017-05-28 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+hourToSecond = 3600 # konstanta
+dayToSecond = 86400 # konstanta
+weekToSecond = 604800 # konstanta
+listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list of idxDomain (elemennya sebanyak listStudent)
+listStudent = []
+listLecturer = []
+listRoom = []
+
+######################################## PROGRAM UTAMA ########################################
+
 initData()
-# execGA()
+execGA()
