@@ -1,12 +1,13 @@
 # LIBRARY
 from __future__ import division
-import calendar
-import datetime
-import os
-import time
 from copy import deepcopy
 from math import ceil, exp, floor
 from random import randint, seed, shuffle
+import calendar
+import datetime
+import json
+import os
+import time
 
 # FUNGSI
 def dateToLong(date):
@@ -232,117 +233,75 @@ def execGA():
     geneticAlgorithm(20)
     printResult()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def student_data_parser(student_data):
-    students = []
-    for i in student_data:
-        temp_student_data = student_data[i]
-        temp_student = Student()
-        temp_student.student_id = temp_student_data['user_id']
-        temp_student.name = temp_student_data['user_name'] + temp_student_data['last_name']
-        temp_student.email = temp_student_data['email']
-        temp_student.topic = temp_student_data['topics']
-        temp_student.dosbing_id = temp_student_data['id_dosen_pembimbing']
+def studentParser(unparsedStudents):
+    students_list = []
+    for unparsedStudent in unparsedStudents:
+        student_id = unparsedStudent['user_id']
+        name = unparsedStudent['name']['first'] + unparsedStudent['name']['last']
+        email = unparsedStudent['email']
+        topic = unparsedStudent['topic']
+        dosbing_id = unparsedStudent['dosbing_id']
         # now we append all of those information here
-        students.append(temp_student)
-    return students
+        students_list.append(Student(student_id, name, email, topic, dosbing_id))
+    return students_list
 
-def lecturer_data_parser(lecturer_data):
-    lecturers = []
-    for i in lecturer_data:
-        temp_lecturer_data = lecturer_data[i]
-        temp_lecturer = Lecturer()
-        temp_lecturer.lecturer_id = temp_lecturer_data['user_id']
-        temp_lecturer.name = temp_lecturer_data['user_name'] + temp_lecturer_data['last_name']
-        temp_lecturer.email = temp_lecturer_data['email']
-        temp_lecturer.topics = temp_lecturer_data['topics']
-        list_of_events = []
+def lecturerParser(unparsedLecturers):
+    lecturers_list = []
+    for unparsedLecturer in unparsedLecturers:
+        lecturer_id = unparsedLecturer['user_id']
+        name = unparsedLecturer['name']['first'] + unparsedLecturer['name']['last']
+        email = unparsedLecturer['email']
+        topics = unparsedLecturer['topic']
+        events = []
         # create event
         try:
-            event_json = temp_lecturer_data['event']
+            listEventData = unparsedLecturer['event']
         except:
             print('Event kosong')
-        if event_json is not None:
-            for j in event_json:
-                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
-                                   event_json[j].date_end)
-                list_of_events.append(temp_event)
-        temp_lecturer.events = list_of_events
+        if listEventData is not None:
+            for eventData in listEventData:
+                event_start = eventData['start_date']
+                event_end = eventData['end_date']
+                # now we append all of those information event here
+                events.append(Event(None, None, event_start, event_end))
         # now we append all of those information here
-        lecturers.append(temp_lecturer)
-    return lecturers
+        lecturers_list.append(Lecturer(lecturer_id, name, email, topics, events))
+    return lecturers_list
 
-def create_initial_data(temp_data = None):
-    if temp_data is None:
-        print ('We need both of student and lecturer data to proceed')
-    else:
-        # create dictionary of lists
-        data = {}
-        data['students_list'] = student_data_parser(temp_data['student_data'])
-        data['lecturers_list'] = lecturer_data_parser(temp_data['lecturer_data'])
-        data['rooms_list'] = room_data_parser(temp_data['room_data'])
+def roomParser(unparsedRooms):
+    rooms_list = []
+    for unparsedRoom in unparsedRooms:
+        room_id = unparsedRoom['user_id']
+        name = unparsedRoom['name']['first'] + unparsedRoom['name']['last']
+        email = unparsedRoom['email']
+        events = []
+        # create event
+        try:
+            listEventData = unparsedRoom['event']
+        except:
+            print('Event kosong')
+        if listEventData is not None:
+            for eventData in listEventData:
+                event_start = eventData['start_date']
+                event_end = eventData['end_date']
+                # now we append all of those information event here
+                events.append(Event(None, None, event_start, event_end))
+        # now we append all of those information here
+        rooms_list.append(Room(room_id, name, email, events))
+    return rooms_list
 
-class Data():
-    def __init__(self, students=None, lecturers=None, sidangs=None):
-        self.students = students
-        self.lecturers = lecturers
-        self.sidangs = sidangs
-
-class Scheduler():
-    def post(self):
-        args = parser.parse_args(strict=True)
-        data_json = {}
-        for k, v in args.items():
-            if v is not None:
-                data_json[k] = v
-        temp_data = json.load(data_json)
-        # student_data = temp_data['student_data']
-        # lecturer_data = temp_data['lecturer_data']
-        # parse student_data
-        # parse professor_data
-        # the result is dictionary of lists
-        result_data = create_initial_data(temp_data)
-        #create data object
-        return 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# TESTING YANG BELUM
-# Scheduler()
+def initData():
+    global students_list
+    global lecturers_list
+    global rooms_list
+    # ambil data dari json
+    with open('data.json') as rawData:
+        unparsedData = json.load(rawData)
+    # parse data
+    students_list = studentParser(unparsedData['student_data'])
+    lecturers_list = lecturerParser(unparsedData['lecturer_data'])
+    # rooms_list = roomParser(unparsedData['room_data'])
 
 # MAIN PROGRAM
-# setelah data-data di load dari json jadi objek (gak ngerti gimana caranya), tinggal uncomment dibawah ini
+initData()
 # execGA()

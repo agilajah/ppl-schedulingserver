@@ -1,696 +1,717 @@
-{"student_data" : [
-  {
-    "user_id": "58f9dd95332d8741421e475a",
-    "name": {
-      "first": "Fleming",
-      "last": "Parker"
-    },
-    "topic": [
-      "machine learning"
+{
+    "student_data":[
+        {
+            "user_id":"58f9dd95332d8741421e475a",
+            "name":{
+                "first":"Fleming",
+                "last":"Parker"
+            },
+            "topic":[
+                "machine learning"
+            ],
+            "email":"fleming.parker@undefined.biz",
+            "dosbing_id":"58f9dc043d4f0ffb6064f7c1",
+            "event":[
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd952d0cf2fbf3027a92",
+            "name":{
+                "first":"Gwendolyn",
+                "last":"Malone"
+            },
+            "topic":[
+                "AI"
+            ],
+            "email":"gwendolyn.malone@undefined.biz",
+            "dosbing_id":"58f9dc04f582b931529138ac",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd952f958ecf7f1e1227",
+            "name":{
+                "first":"Hensley",
+                "last":"Wells"
+            },
+            "topic":[
+                "network"
+            ],
+            "email":"hensley.wells@undefined.org",
+            "dosbing_id":"58f9dc04d57fdbf6dfa4898a",
+            "event":[
+                {
+                    "start_date":"2017-05-14 02:30:00",
+                    "end_date":"2017-05-14 03:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd953b0f63ee3ef57f40",
+            "name":{
+                "first":"Dorothea",
+                "last":"Sullivan"
+            },
+            "topic":[
+                "encryption"
+            ],
+            "email":"dorothea.sullivan@undefined.me",
+            "dosbing_id":"58f9dc04750d6d3e303568ee",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd951994db6a03f33413",
+            "name":{
+                "first":"Karyn",
+                "last":"Carver"
+            },
+            "topic":[
+                "UX"
+            ],
+            "email":"karyn.carver@undefined.co.uk",
+            "dosbing_id":"58f9dc04723f09fff80024e6",
+            "event":[
+                {
+                    "start_date":"2017-05-13 08:00:00",
+                    "end_date":"2017-05-13 09:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd95271e5c9002748973",
+            "name":{
+                "first":"Freda",
+                "last":"Mcintyre"
+            },
+            "topic":[
+                "encryption"
+            ],
+            "email":"freda.mcintyre@undefined.info",
+            "dosbing_id":"58f9dc04bf2cb474ca646315",
+            "event":[
+                {
+                    "start_date":"2017-05-14 03:00:00",
+                    "end_date":"2017-05-14 04:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd95ccfe6a4380c41438",
+            "name":{
+                "first":"Joyce",
+                "last":"Hughes"
+            },
+            "topic":[
+                "graphic"
+            ],
+            "email":"joyce.hughes@undefined.io",
+            "dosbing_id":"58f9dc043d4f0ffb6064f7c1",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd955886d1a631102ef6",
+            "name":{
+                "first":"Fuller",
+                "last":"Carson"
+            },
+            "topic":[
+                "graphic"
+            ],
+            "email":"fuller.carson@undefined.tv",
+            "dosbing_id":"58f9dc04f582b931529138ac",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd95d502832695ecbbd7",
+            "name":{
+                "first":"Katherine",
+                "last":"Lancaster"
+            },
+            "topic":[
+                "security"
+            ],
+            "email":"katherine.lancaster@undefined.net",
+            "dosbing_id":"58f9dc043d4f0ffb6064f7c1",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd95fb2f123c37b92637",
+            "name":{
+                "first":"Fox",
+                "last":"Green"
+            },
+            "topic":[
+                "encryption"
+            ],
+            "email":"fox.green@undefined.ca",
+            "dosbing_id":"58f9dc04f582b931529138ac",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd957edf2910ccea5c5e",
+            "name":{
+                "first":"Ashley",
+                "last":"Bowers"
+            },
+            "topic":[
+                "graphic"
+            ],
+            "email":"ashley.bowers@undefined.us",
+            "dosbing_id":"58f9dc043d4f0ffb6064f7c1",
+            "event":[
+                {
+                    "start_date":"2017-05-03 10:30:00",
+                    "end_date":"2017-05-03 09:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd953859168b35a12c53",
+            "name":{
+                "first":"Ashley",
+                "last":"Peters"
+            },
+            "topic":[
+                "encryption"
+            ],
+            "email":"ashley.peters@undefined.com",
+            "dosbing_id":"58f9dc03ad06bed579a88197",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd954d49a91d16e0c9bb",
+            "name":{
+                "first":"Brady",
+                "last":"Gaines"
+            },
+            "topic":[
+                "network"
+            ],
+            "email":"brady.gaines@undefined.biz",
+            "dosbing_id":"58f9dc04d57fdbf6dfa4898a",
+            "event":[
+                {
+                    "start_date":"2017-05-14 07:00:00",
+                    "end_date":"2017-04-14 10:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd9504d359a3d53938e9",
+            "name":{
+                "first":"Candy",
+                "last":"Boone"
+            },
+            "topic":[
+                "graphic"
+            ],
+            "email":"candy.boone@undefined.biz",
+            "dosbing_id":"58f9dc04f582b931529138ac",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd95f7a5954a4a508f1b",
+            "name":{
+                "first":"Mccall",
+                "last":"Herrera"
+            },
+            "topic":[
+                "encryption"
+            ],
+            "email":"mccall.herrera@undefined.org",
+            "dosbing_id":"58f9dc043d4f0ffb6064f7c1",
+            "event":[
+                {
+                    "start_date":"2017-05-10 05:00:00",
+                    "end_date":"2017-05-10 10:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd95723027c717ba6143",
+            "name":{
+                "first":"Gabriela",
+                "last":"Watkins"
+            },
+            "topic":[
+                "database"
+            ],
+            "email":"gabriela.watkins@undefined.me",
+            "dosbing_id":"58f9dc04dc06e3d8d15f86c9",
+            "event":[
+                {
+                    "start_date":"2017-05-10 07:00:00",
+                    "end_date":"2017-05-10 09:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd95b452fe14ca434686",
+            "name":{
+                "first":"Evangelina",
+                "last":"Ferguson"
+            },
+            "topic":[
+                "network"
+            ],
+            "email":"evangelina.ferguson@undefined.co.uk",
+            "dosbing_id":"58f9dc04723f09fff80024e6",
+            "event":[
+
+            ]
+        },
+        {
+            "user_id":"58f9dd95500f2ecd1bbacf57",
+            "name":{
+                "first":"Knight",
+                "last":"Buckley"
+            },
+            "topic":[
+                "graphic"
+            ],
+            "email":"knight.buckley@undefined.info",
+            "dosbing_id":"58f9dc04e19c3e8564d82c68",
+            "event":[
+                {
+                    "start_date":"2017-05-07 09:00:00",
+                    "end_date":"2017-05-07 11:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dd957d24d69dd8eb11f2",
+            "name":{
+                "first":"Klein",
+                "last":"Stein"
+            },
+            "topic":[
+                "database"
+            ],
+            "email":"klein.stein@undefined.io",
+            "dosbing_id":"58f9dc03ad06bed579a88197",
+            "event":[
+                {
+                    "start_date":"2017-04-28 10:30:00",
+                    "end_date":"2017-04-28 11:00:00"
+                },
+                {
+                    "start_date":"2017-05-15 10:00:00",
+                    "end_date":"2017-05-15 10:30:00"
+                }
+            ]
+        }
     ],
-    "email": "fleming.parker@undefined.biz",
-    "id_dosen_pebimbing": "58f9dc043d4f0ffb6064f7c1",
-    "event": [
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      }
+    "lecturer_data":[
+        {
+            "user_id":"58f9dc03ad06bed579a88197",
+            "name":{
+                "first":"Lourdes",
+                "last":"Ellis"
+            },
+            "topic":[
+                "database",
+                "graphic",
+                "database"
+            ],
+            "email":"lourdes.ellis@undefined.us",
+            "event":[
+                {
+                    "start_date":"2017-05-01 00:00:00",
+                    "end_date":"2017-05-01 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-30 00:00:00",
+                    "end_date":"2017-04-30 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-06 00:00:00",
+                    "end_date":"2017-05-06 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-25 00:00:00",
+                    "end_date":"2017-04-25 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-29 00:00:00",
+                    "end_date":"2017-04-29 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-27 00:00:00",
+                    "end_date":"2017-04-27 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-08 00:00:00",
+                    "end_date":"2017-05-08 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04dc06e3d8d15f86c9",
+            "name":{
+                "first":"Gilda",
+                "last":"Albert"
+            },
+            "topic":[
+                "machine learning",
+                "database",
+                "graphic"
+            ],
+            "email":"gilda.albert@undefined.name",
+            "event":[
+                {
+                    "start_date":"2017-04-22 00:00:00",
+                    "end_date":"2017-04-22 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-12 00:00:00",
+                    "end_date":"2017-05-12 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-13 00:00:00",
+                    "end_date":"2017-05-13 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-16 00:00:00",
+                    "end_date":"2017-05-16 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-19 00:00:00",
+                    "end_date":"2017-05-19 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04723f09fff80024e6",
+            "name":{
+                "first":"Grace",
+                "last":"Bush"
+            },
+            "topic":[
+                "machine learning",
+                "AI"
+            ],
+            "email":"grace.bush@undefined.co.uk",
+            "event":[
+                {
+                    "start_date":"2017-05-07 00:00:00",
+                    "end_date":"2017-05-07 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-09 00:00:00",
+                    "end_date":"2017-05-09 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-12 00:00:00",
+                    "end_date":"2017-05-12 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-02 00:00:00",
+                    "end_date":"2017-05-02 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-08 00:00:00",
+                    "end_date":"2017-05-08 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-10 00:00:00",
+                    "end_date":"2017-05-10 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-14 00:00:00",
+                    "end_date":"2017-05-14 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-09 00:00:00",
+                    "end_date":"2017-05-09 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc043d4f0ffb6064f7c1",
+            "name":{
+                "first":"Talley",
+                "last":"Logan"
+            },
+            "topic":[
+                "encryption",
+                "AI",
+                "UX"
+            ],
+            "email":"talley.logan@undefined.info",
+            "event":[
+                {
+                    "start_date":"2017-04-26 00:00:00",
+                    "end_date":"2017-04-26 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-05 00:00:00",
+                    "end_date":"2017-05-05 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-16 00:00:00",
+                    "end_date":"2017-05-16 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-07 00:00:00",
+                    "end_date":"2017-05-07 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-19 00:00:00",
+                    "end_date":"2017-05-19 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-02 00:00:00",
+                    "end_date":"2017-05-02 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-10 00:00:00",
+                    "end_date":"2017-05-10 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-05 00:00:00",
+                    "end_date":"2017-05-05 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04e19c3e8564d82c68",
+            "name":{
+                "first":"Farley",
+                "last":"Jensen"
+            },
+            "topic":[
+                "encryption"
+            ],
+            "email":"farley.jensen@undefined.com",
+            "event":[
+                {
+                    "start_date":"2017-04-22 00:00:00",
+                    "end_date":"2017-04-22 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-26 00:00:00",
+                    "end_date":"2017-04-26 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-29 00:00:00",
+                    "end_date":"2017-04-29 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-02 00:00:00",
+                    "end_date":"2017-05-02 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-14 00:00:00",
+                    "end_date":"2017-05-14 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-28 00:00:00",
+                    "end_date":"2017-04-28 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04f582b931529138ac",
+            "name":{
+                "first":"Irma",
+                "last":"Sargent"
+            },
+            "topic":[
+                "AI"
+            ],
+            "email":"irma.sargent@undefined.io",
+            "event":[
+                {
+                    "start_date":"2017-04-25 00:00:00",
+                    "end_date":"2017-04-25 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-16 00:00:00",
+                    "end_date":"2017-05-16 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-13 00:00:00",
+                    "end_date":"2017-05-13 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-04 00:00:00",
+                    "end_date":"2017-05-04 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-01 00:00:00",
+                    "end_date":"2017-05-01 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-29 00:00:00",
+                    "end_date":"2017-04-29 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-11 00:00:00",
+                    "end_date":"2017-05-11 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04bf2cb474ca646315",
+            "name":{
+                "first":"Lambert",
+                "last":"Hensley"
+            },
+            "topic":[
+                "database",
+                "machine learning"
+            ],
+            "email":"lambert.hensley@undefined.me",
+            "event":[
+                {
+                    "start_date":"2017-04-24 00:00:00",
+                    "end_date":"2017-04-24 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-03 00:00:00",
+                    "end_date":"2017-05-03 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-15 00:00:00",
+                    "end_date":"2017-05-15 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-15 00:00:00",
+                    "end_date":"2017-05-15 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-15 00:00:00",
+                    "end_date":"2017-05-15 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-02 00:00:00",
+                    "end_date":"2017-05-02 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04750d6d3e303568ee",
+            "name":{
+                "first":"Viola",
+                "last":"Livingston"
+            },
+            "topic":[
+                "encryption",
+                "machine learning"
+            ],
+            "email":"viola.livingston@undefined.net",
+            "event":[
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-29 00:00:00",
+                    "end_date":"2017-04-29 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-26 00:00:00",
+                    "end_date":"2017-04-26 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-27 00:00:00",
+                    "end_date":"2017-04-27 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-12 00:00:00",
+                    "end_date":"2017-05-12 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-29 00:00:00",
+                    "end_date":"2017-04-29 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-12 00:00:00",
+                    "end_date":"2017-05-12 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-23 00:00:00",
+                    "end_date":"2017-04-23 02:00:00"
+                }
+            ]
+        },
+        {
+            "user_id":"58f9dc04d57fdbf6dfa4898a",
+            "name":{
+                "first":"Celina",
+                "last":"Gonzales"
+            },
+            "topic":[
+                "AI",
+                "encryption",
+                "AI"
+            ],
+            "email":"celina.gonzales@undefined.biz",
+            "event":[
+                {
+                    "start_date":"2017-04-26 00:00:00",
+                    "end_date":"2017-04-26 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-29 00:00:00",
+                    "end_date":"2017-04-29 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-16 00:00:00",
+                    "end_date":"2017-05-16 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-14 00:00:00",
+                    "end_date":"2017-05-14 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-17 00:00:00",
+                    "end_date":"2017-05-17 02:00:00"
+                },
+                {
+                    "start_date":"2017-04-24 00:00:00",
+                    "end_date":"2017-04-24 02:00:00"
+                },
+                {
+                    "start_date":"2017-05-08 00:00:00",
+                    "end_date":"2017-05-08 02:00:00"
+                }
+            ]
+        }
     ]
-  },
-  {
-    "user_id": "58f9dd952d0cf2fbf3027a92",
-    "name": {
-      "first": "Gwendolyn",
-      "last": "Malone"
-    },
-    "topic": [
-      "AI"
-    ],
-    "email": "gwendolyn.malone@undefined.biz",
-    "id_dosen_pebimbing": "58f9dc04f582b931529138ac",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd952f958ecf7f1e1227",
-    "name": {
-      "first": "Hensley",
-      "last": "Wells"
-    },
-    "topic": [
-      "network"
-    ],
-    "email": "hensley.wells@undefined.org",
-    "id_dosen_pebimbing": "58f9dc04d57fdbf6dfa4898a",
-    "event": [
-      {
-        "start_date": "2017-05-14 02:30:00",
-        "end_date": "2017-05-14 03:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd953b0f63ee3ef57f40",
-    "name": {
-      "first": "Dorothea",
-      "last": "Sullivan"
-    },
-    "topic": [
-      "encryption"
-    ],
-    "email": "dorothea.sullivan@undefined.me",
-    "id_dosen_pebimbing": "58f9dc04750d6d3e303568ee",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd951994db6a03f33413",
-    "name": {
-      "first": "Karyn",
-      "last": "Carver"
-    },
-    "topic": [
-      "UX"
-    ],
-    "email": "karyn.carver@undefined.co.uk",
-    "id_dosen_pebimbing": "58f9dc04723f09fff80024e6",
-    "event": [
-      {
-        "start_date": "2017-05-13 08:00:00",
-        "end_date": "2017-05-13 09:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd95271e5c9002748973",
-    "name": {
-      "first": "Freda",
-      "last": "Mcintyre"
-    },
-    "topic": [
-      "encryption"
-    ],
-    "email": "freda.mcintyre@undefined.info",
-    "id_dosen_pebimbing": "58f9dc04bf2cb474ca646315",
-    "event": [
-      {
-        "start_date": "2017-05-14 03:00:00",
-        "end_date": "2017-05-14 04:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd95ccfe6a4380c41438",
-    "name": {
-      "first": "Joyce",
-      "last": "Hughes"
-    },
-    "topic": [
-      "graphic"
-    ],
-    "email": "joyce.hughes@undefined.io",
-    "id_dosen_pebimbing": "58f9dc043d4f0ffb6064f7c1",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd955886d1a631102ef6",
-    "name": {
-      "first": "Fuller",
-      "last": "Carson"
-    },
-    "topic": [
-      "graphic"
-    ],
-    "email": "fuller.carson@undefined.tv",
-    "id_dosen_pebimbing": "58f9dc04f582b931529138ac",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd95d502832695ecbbd7",
-    "name": {
-      "first": "Katherine",
-      "last": "Lancaster"
-    },
-    "topic": [
-      "security"
-    ],
-    "email": "katherine.lancaster@undefined.net",
-    "id_dosen_pebimbing": "58f9dc043d4f0ffb6064f7c1",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd95fb2f123c37b92637",
-    "name": {
-      "first": "Fox",
-      "last": "Green"
-    },
-    "topic": [
-      "encryption"
-    ],
-    "email": "fox.green@undefined.ca",
-    "id_dosen_pebimbing": "58f9dc04f582b931529138ac",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd957edf2910ccea5c5e",
-    "name": {
-      "first": "Ashley",
-      "last": "Bowers"
-    },
-    "topic": [
-      "graphic"
-    ],
-    "email": "ashley.bowers@undefined.us",
-    "id_dosen_pebimbing": "58f9dc043d4f0ffb6064f7c1",
-    "event": [
-      {
-        "start_date": "2017-05-03 10:30:00",
-        "end_date": "2017-05-03 09:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd953859168b35a12c53",
-    "name": {
-      "first": "Ashley",
-      "last": "Peters"
-    },
-    "topic": [
-      "encryption"
-    ],
-    "email": "ashley.peters@undefined.com",
-    "id_dosen_pebimbing": "58f9dc03ad06bed579a88197",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd954d49a91d16e0c9bb",
-    "name": {
-      "first": "Brady",
-      "last": "Gaines"
-    },
-    "topic": [
-      "network"
-    ],
-    "email": "brady.gaines@undefined.biz",
-    "id_dosen_pebimbing": "58f9dc04d57fdbf6dfa4898a",
-    "event": [
-      {
-        "start_date": "2017-05-14 07:00:00",
-        "end_date": "2017-04-14 10:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd9504d359a3d53938e9",
-    "name": {
-      "first": "Candy",
-      "last": "Boone"
-    },
-    "topic": [
-      "graphic"
-    ],
-    "email": "candy.boone@undefined.biz",
-    "id_dosen_pebimbing": "58f9dc04f582b931529138ac",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd95f7a5954a4a508f1b",
-    "name": {
-      "first": "Mccall",
-      "last": "Herrera"
-    },
-    "topic": [
-      "encryption"
-    ],
-    "email": "mccall.herrera@undefined.org",
-    "id_dosen_pebimbing": "58f9dc043d4f0ffb6064f7c1",
-    "event": [
-      {
-        "start_date": "2017-05-10 05:00:00",
-        "end_date": "2017-05-10 10:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd95723027c717ba6143",
-    "name": {
-      "first": "Gabriela",
-      "last": "Watkins"
-    },
-    "topic": [
-      "database"
-    ],
-    "email": "gabriela.watkins@undefined.me",
-    "id_dosen_pebimbing": "58f9dc04dc06e3d8d15f86c9",
-    "event": [
-      {
-        "start_date": "2017-05-10 07:00:00",
-        "end_date": "2017-05-10 09:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd95b452fe14ca434686",
-    "name": {
-      "first": "Evangelina",
-      "last": "Ferguson"
-    },
-    "topic": [
-      "network"
-    ],
-    "email": "evangelina.ferguson@undefined.co.uk",
-    "id_dosen_pebimbing": "58f9dc04723f09fff80024e6",
-    "event": []
-  },
-  {
-    "user_id": "58f9dd95500f2ecd1bbacf57",
-    "name": {
-      "first": "Knight",
-      "last": "Buckley"
-    },
-    "topic": [
-      "graphic"
-    ],
-    "email": "knight.buckley@undefined.info",
-    "id_dosen_pebimbing": "58f9dc04e19c3e8564d82c68",
-    "event": [
-      {
-        "start_date": "2017-05-07 09:00:00",
-        "end_date": "2017-05-07 11:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dd957d24d69dd8eb11f2",
-    "name": {
-      "first": "Klein",
-      "last": "Stein"
-    },
-    "topic": [
-      "database"
-    ],
-    "email": "klein.stein@undefined.io",
-    "id_dosen_pebimbing": "58f9dc03ad06bed579a88197",
-    "event": [
-      {
-        "start_date": "2017-04-28 10:30:00",
-        "end_date": "2017-04-28 11:00:00"
-      },
-      {
-        "start_date": "2017-05-15 10:00:00",
-        "end_date": "2017-05-15 10:30:00"
-      }
-    ]
-  }
-], "lecturer_data" : [
-  {
-    "user_id": "58f9dc03ad06bed579a88197",
-    "name": {
-      "first": "Lourdes",
-      "last": "Ellis"
-    },
-    "topic": [
-      "database",
-      "graphic",
-      "database"
-    ],
-    "email": "lourdes.ellis@undefined.us",
-    "event": [
-      {
-        "start_date": "2017-05-01 00:00:00",
-        "end_date": "2017-05-01 02:00:00"
-      },
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      },
-      {
-        "start_date": "2017-04-30 00:00:00",
-        "end_date": "2017-04-30 02:00:00"
-      },
-      {
-        "start_date": "2017-05-06 00:00:00",
-        "end_date": "2017-05-06 02:00:00"
-      },
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      },
-      {
-        "start_date": "2017-04-25 00:00:00",
-        "end_date": "2017-04-25 02:00:00"
-      },
-      {
-        "start_date": "2017-04-29 00:00:00",
-        "end_date": "2017-04-29 02:00:00"
-      },
-      {
-        "start_date": "2017-04-27 00:00:00",
-        "end_date": "2017-04-27 02:00:00"
-      },
-      {
-        "start_date": "2017-05-08 00:00:00",
-        "end_date": "2017-05-08 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04dc06e3d8d15f86c9",
-    "name": {
-      "first": "Gilda",
-      "last": "Albert"
-    },
-    "topic": [
-      "machine learning",
-      "database",
-      "graphic"
-    ],
-    "email": "gilda.albert@undefined.name",
-    "event": [
-      {
-        "start_date": "2017-04-22 00:00:00",
-        "end_date": "2017-04-22 02:00:00"
-      },
-      {
-        "start_date": "2017-05-12 00:00:00",
-        "end_date": "2017-05-12 02:00:00"
-      },
-      {
-        "start_date": "2017-05-13 00:00:00",
-        "end_date": "2017-05-13 02:00:00"
-      },
-      {
-        "start_date": "2017-05-16 00:00:00",
-        "end_date": "2017-05-16 02:00:00"
-      },
-      {
-        "start_date": "2017-05-19 00:00:00",
-        "end_date": "2017-05-19 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04723f09fff80024e6",
-    "name": {
-      "first": "Grace",
-      "last": "Bush"
-    },
-    "topic": [
-      "machine learning",
-      "AI"
-    ],
-    "email": "grace.bush@undefined.co.uk",
-    "event": [
-      {
-        "start_date": "2017-05-07 00:00:00",
-        "end_date": "2017-05-07 02:00:00"
-      },
-      {
-        "start_date": "2017-05-09 00:00:00",
-        "end_date": "2017-05-09 02:00:00"
-      },
-      {
-        "start_date": "2017-05-12 00:00:00",
-        "end_date": "2017-05-12 02:00:00"
-      },
-      {
-        "start_date": "2017-05-02 00:00:00",
-        "end_date": "2017-05-02 02:00:00"
-      },
-      {
-        "start_date": "2017-05-08 00:00:00",
-        "end_date": "2017-05-08 02:00:00"
-      },
-      {
-        "start_date": "2017-05-10 00:00:00",
-        "end_date": "2017-05-10 02:00:00"
-      },
-      {
-        "start_date": "2017-05-14 00:00:00",
-        "end_date": "2017-05-14 02:00:00"
-      },
-      {
-        "start_date": "2017-05-09 00:00:00",
-        "end_date": "2017-05-09 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc043d4f0ffb6064f7c1",
-    "name": {
-      "first": "Talley",
-      "last": "Logan"
-    },
-    "topic": [
-      "encryption",
-      "AI",
-      "UX"
-    ],
-    "email": "talley.logan@undefined.info",
-    "event": [
-      {
-        "start_date": "2017-04-26 00:00:00",
-        "end_date": "2017-04-26 02:00:00"
-      },
-      {
-        "start_date": "2017-05-05 00:00:00",
-        "end_date": "2017-05-05 02:00:00"
-      },
-      {
-        "start_date": "2017-05-16 00:00:00",
-        "end_date": "2017-05-16 02:00:00"
-      },
-      {
-        "start_date": "2017-05-07 00:00:00",
-        "end_date": "2017-05-07 02:00:00"
-      },
-      {
-        "start_date": "2017-05-19 00:00:00",
-        "end_date": "2017-05-19 02:00:00"
-      },
-      {
-        "start_date": "2017-05-02 00:00:00",
-        "end_date": "2017-05-02 02:00:00"
-      },
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      },
-      {
-        "start_date": "2017-05-10 00:00:00",
-        "end_date": "2017-05-10 02:00:00"
-      },
-      {
-        "start_date": "2017-05-05 00:00:00",
-        "end_date": "2017-05-05 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04e19c3e8564d82c68",
-    "name": {
-      "first": "Farley",
-      "last": "Jensen"
-    },
-    "topic": [
-      "encryption"
-    ],
-    "email": "farley.jensen@undefined.com",
-    "event": [
-      {
-        "start_date": "2017-04-22 00:00:00",
-        "end_date": "2017-04-22 02:00:00"
-      },
-      {
-        "start_date": "2017-04-26 00:00:00",
-        "end_date": "2017-04-26 02:00:00"
-      },
-      {
-        "start_date": "2017-04-29 00:00:00",
-        "end_date": "2017-04-29 02:00:00"
-      },
-      {
-        "start_date": "2017-05-02 00:00:00",
-        "end_date": "2017-05-02 02:00:00"
-      },
-      {
-        "start_date": "2017-05-14 00:00:00",
-        "end_date": "2017-05-14 02:00:00"
-      },
-      {
-        "start_date": "2017-04-28 00:00:00",
-        "end_date": "2017-04-28 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04f582b931529138ac",
-    "name": {
-      "first": "Irma",
-      "last": "Sargent"
-    },
-    "topic": [
-      "AI"
-    ],
-    "email": "irma.sargent@undefined.io",
-    "event": [
-      {
-        "start_date": "2017-04-25 00:00:00",
-        "end_date": "2017-04-25 02:00:00"
-      },
-      {
-        "start_date": "2017-05-16 00:00:00",
-        "end_date": "2017-05-16 02:00:00"
-      },
-      {
-        "start_date": "2017-05-13 00:00:00",
-        "end_date": "2017-05-13 02:00:00"
-      },
-      {
-        "start_date": "2017-05-04 00:00:00",
-        "end_date": "2017-05-04 02:00:00"
-      },
-      {
-        "start_date": "2017-05-01 00:00:00",
-        "end_date": "2017-05-01 02:00:00"
-      },
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      },
-      {
-        "start_date": "2017-04-29 00:00:00",
-        "end_date": "2017-04-29 02:00:00"
-      },
-      {
-        "start_date": "2017-05-11 00:00:00",
-        "end_date": "2017-05-11 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04bf2cb474ca646315",
-    "name": {
-      "first": "Lambert",
-      "last": "Hensley"
-    },
-    "topic": [
-      "database",
-      "machine learning"
-    ],
-    "email": "lambert.hensley@undefined.me",
-    "event": [
-      {
-        "start_date": "2017-04-24 00:00:00",
-        "end_date": "2017-04-24 02:00:00"
-      },
-      {
-        "start_date": "2017-05-03 00:00:00",
-        "end_date": "2017-05-03 02:00:00"
-      },
-      {
-        "start_date": "2017-05-15 00:00:00",
-        "end_date": "2017-05-15 02:00:00"
-      },
-      {
-        "start_date": "2017-05-15 00:00:00",
-        "end_date": "2017-05-15 02:00:00"
-      },
-      {
-        "start_date": "2017-05-15 00:00:00",
-        "end_date": "2017-05-15 02:00:00"
-      },
-      {
-        "start_date": "2017-05-02 00:00:00",
-        "end_date": "2017-05-02 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04750d6d3e303568ee",
-    "name": {
-      "first": "Viola",
-      "last": "Livingston"
-    },
-    "topic": [
-      "encryption",
-      "machine learning"
-    ],
-    "email": "viola.livingston@undefined.net",
-    "event": [
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      },
-      {
-        "start_date": "2017-04-29 00:00:00",
-        "end_date": "2017-04-29 02:00:00"
-      },
-      {
-        "start_date": "2017-04-26 00:00:00",
-        "end_date": "2017-04-26 02:00:00"
-      },
-      {
-        "start_date": "2017-04-27 00:00:00",
-        "end_date": "2017-04-27 02:00:00"
-      },
-      {
-        "start_date": "2017-05-12 00:00:00",
-        "end_date": "2017-05-12 02:00:00"
-      },
-      {
-        "start_date": "2017-04-29 00:00:00",
-        "end_date": "2017-04-29 02:00:00"
-      },
-      {
-        "start_date": "2017-05-12 00:00:00",
-        "end_date": "2017-05-12 02:00:00"
-      },
-      {
-        "start_date": "2017-04-23 00:00:00",
-        "end_date": "2017-04-23 02:00:00"
-      }
-    ]
-  },
-  {
-    "user_id": "58f9dc04d57fdbf6dfa4898a",
-    "name": {
-      "first": "Celina",
-      "last": "Gonzales"
-    },
-    "topic": [
-      "AI",
-      "encryption",
-      "AI"
-    ],
-    "email": "celina.gonzales@undefined.biz",
-    "event": [
-      {
-        "start_date": "2017-04-26 00:00:00",
-        "end_date": "2017-04-26 02:00:00"
-      },
-      {
-        "start_date": "2017-04-29 00:00:00",
-        "end_date": "2017-04-29 02:00:00"
-      },
-      {
-        "start_date": "2017-05-16 00:00:00",
-        "end_date": "2017-05-16 02:00:00"
-      },
-      {
-        "start_date": "2017-05-14 00:00:00",
-        "end_date": "2017-05-14 02:00:00"
-      },
-      {
-        "start_date": "2017-05-17 00:00:00",
-        "end_date": "2017-05-17 02:00:00"
-      },
-      {
-        "start_date": "2017-04-24 00:00:00",
-        "end_date": "2017-04-24 02:00:00"
-      },
-      {
-        "start_date": "2017-05-08 00:00:00",
-        "end_date": "2017-05-08 02:00:00"
-      }
-    ]
-  }
-]}
+}
