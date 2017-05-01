@@ -76,8 +76,10 @@ class Sidang():
         self.events.sort(key = lambda event : event.startLong)
         self.domains = [] # semua kemungkinan ruang&jadwal yang bisa digunakan
         self.searchDomains()
-        self.totalDomain = len(self.domains)
-        self.idxDomain = -1 # hasil algoritma adalah ini, salah satu ruang&jadwal dari banyak kemungkinan tersebut
+        if (len(self.domains) == 0):
+            raise Exception('Mahasiswa ' + studentID + ' tidak mempunyai kemungkinan jadwal sidang.')
+        else:
+            self.idxDomain = 0 # hasil algoritma adalah ini, salah satu ruang&jadwal dari banyak kemungkinan tersebut
     def mergeEventsLecturers(self):
         for lecturerID in self.lecturersID:
             # cari dosennya
@@ -159,7 +161,7 @@ def countDomainConflicts():
                 domain1 = student1.sidang.domains[student1.sidang.idxDomain]
                 domain2 = student2.sidang.domains[student2.sidang.idxDomain]
                 result += isDomainConflict(domain1, domain2)
-    return result
+    return int(result / 2)
 
 def geneticAlgorithm(maxGeneration):
 # implementasi genetic algorithm
@@ -168,6 +170,7 @@ def geneticAlgorithm(maxGeneration):
     fitness = [] # score fitness untuk tiap gen
     generation = 0
     while True:
+        generation += 1
         # hitung fitness tiap gen
         del fitness[:]
         for i in range(len(listGen)):
@@ -182,7 +185,6 @@ def geneticAlgorithm(maxGeneration):
         # masih ada konflik di semua gen, cari gen terjelek dan terbagus
         idxMin = fitness.index(max(fitness))
         idxMax = fitness.index(min(fitness))
-        generation += 1
         print "Ada", fitness[idxMax], "konflik dalam generasi ke", generation
         # gak nemu solusi sampai generation ke-maxGeneration
         if generation == maxGeneration:
@@ -210,7 +212,7 @@ def geneticAlgorithm(maxGeneration):
             # mutasi = student ke-studentMutasi setiap gen, domainnya berubah menjadi domainMutasi
             for gen in listGen:
                 studentMutasi = randint(0, len(listStudent) - 1)
-                domainMutasi = randint(0, listStudent[studentMutasi].sidang.totalDomain - 1)
+                domainMutasi = randint(0, len(listStudent[studentMutasi].sidang.domains) - 1)
                 gen[studentMutasi] = domainMutasi
 
 def printResult():
@@ -230,13 +232,8 @@ def printResult():
         # cetak ke layar
         print '   ', domain.event.startDate, 'di', room.name, ':', student.name
         # data untuk cetak ke file
-        result = {}
-        result.update({"studentID" : student.studentID})
-        result.update({"pembimbingID" : student.pembimbingID})
-        result.update({"pengujiID" : student.pengujiID})
-        result.update({"roomID" : room.roomID})
-        result.update({"start" : domain.event.startDate})
-        result.update({"end" : domain.event.endDate})
+        result = {"studentID" : student.studentID, "pembimbingID" : student.pembimbingID, "pengujiID" : student.pengujiID,
+            "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
     # cetak ke file
     with open('result.json', 'w') as outfile:
@@ -245,13 +242,20 @@ def printResult():
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
     global listGen
-    for i in range(len(listGen)):
-        del listGen[i][:]
-        # inisialisasi, untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
-        for student in listStudent:
-            listGen[i].append(randint(0, student.sidang.totalDomain - 1))
-    geneticAlgorithm(20)
-    printResult()
+    try:
+        for i in range(len(listGen)):
+            del listGen[i][:]
+            # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
+            for student in listStudent:
+                listGen[i].append(randint(0, len(student.sidang.domains) - 1))
+        geneticAlgorithm(20)
+    except Exception as e:
+        print 'Error when searching solution :', e
+    else:
+        try:
+            printResult()
+        except Exception as e2:
+            print 'Error when displaying result :', e2
 
 def studentParser(unparsedStudents):
     global listStudent
@@ -277,8 +281,8 @@ def lecturerParser(unparsedLecturers):
         try:
             listEventData = unparsedLecturer['events']
         except:
-            print('No event')
-        if listEventData is not None:
+            print lecturerID, 'has no event.'
+        else:
             for eventData in listEventData:
                 start = eventData['start']
                 end = eventData['end']
@@ -298,8 +302,8 @@ def roomParser(unparsedRooms):
         try:
             listEventData = unparsedRoom['events']
         except:
-            print('No event')
-        if listEventData is not None:
+            print roomID, 'has no event.'
+        else:
             for eventData in listEventData:
                 start = eventData['start']
                 end = eventData['end']
@@ -309,17 +313,26 @@ def roomParser(unparsedRooms):
         listRoom.append(Room(roomID, name, email, events))
 
 def initData():
-    # ambil data dari json
-    with open('data.json') as rawData:
-        unparsedData = json.load(rawData)
-    # parse data
-    roomParser(unparsedData['listRoom'])
-    lecturerParser(unparsedData['listLecturer'])
-    studentParser(unparsedData['listStudent'])
+    try: # ambil data dari json
+        filename = 'data.json'
+        with open(filename) as rawData:
+            unparsedData = json.load(rawData)
+    except Exception as e:
+        print 'Error when loading', filename, ':', e
+        return False
+    else:
+        try: # parse data
+            roomParser(unparsedData['listRoom'])
+            lecturerParser(unparsedData['listLecturer'])
+            studentParser(unparsedData['listStudent'])
+        except Exception as e2:
+            print 'Error when parsing', filename, ':', e2
+            return False
+    return True
 
 ######################################## VARIABLE ########################################
 
-sidangPeriod = Event(None, 'Masa Sidang', '2017-05-01 07:00:00', '2017-05-28 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+sidangPeriod = Event(None, 'Masa Sidang', '2017-07-03 07:00:00', '2017-07-03 13:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
@@ -330,5 +343,5 @@ listRoom = []
 
 ######################################## PROGRAM UTAMA ########################################
 
-initData()
-execGA()
+if (initData()):
+    execGA()
