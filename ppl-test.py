@@ -12,7 +12,6 @@
 # LIBRARY
 from __future__ import division
 import calendar
-import date
 import datetime
 import os
 import time
@@ -26,14 +25,14 @@ def dateToLong(date):
     return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
 
 # FUNGSI
-def longtoDate(date):
+def longToDate(date):
 # input long, output string tanggal sesuai format google calendar
     return datetime.datetime.fromtimestamp(date).strftime("%Y-%m-%d %H:%M:%S")
 
 # STRUKTUR DATA
-class Event(object):
+class Event():
 # kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
-    def __init__(self, event_id = None, name = None, date_start = '2017-05-01 07:00:00', date_end = '2017-05-01 07:00:05'):
+    def __init__(self, event_id, name = 'An event', date_start = '', date_end= ''):
         self.event_id = event_id
         self.name = name
         self.date_start = date_start
@@ -42,69 +41,58 @@ class Event(object):
         self.long_start = dateToLong(date_start)
         self.long_end = dateToLong(date_end)
 
-# FUNGSI LAMDA
-def getEventKey(event):
-# digunakan untuk fungsi sort()
-    return event.long_start
-
 # VARIABLE GLOBAL
 sidang_period = Event(1212, 'Masa Sidang', '2017-05-01 07:00:00', '2017-05-12 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
-print("tesst period")
-print(str(sidang_period.date_start))
-print(str(sidang_period.date_end))
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
 
 # STRUKTUR DATA
-class Lecturer(object):
+class Lecturer():
 # dosen
-    def __init__(self, lecturer_id = None, name = None, email = None, topics = None, events = None):
+    def __init__(self, lecturer_id, name = 'Foolan', email = 'foolan@gmail.com', topics = [], events = []):
         self.lecturer_id = lecturer_id
         self.name = name
         self.email = email
         self.topics = topics
         self.events = events # jadwal sibuk dosen
-        self.events.sort(key = getEventKey)
+        self.events.sort(key = lambda event : event.long_start)
 
 # STRUKTUR DATA
-class Room(object):
+class Room():
 # ruangan
-    def __init__(self, room_id = None, name = None, email = None, events = None):
+    def __init__(self, room_id, name = 'A room', email = 'a_room@gmail.com', events = []):
         self.room_id = room_id
         self.name = name
         self.email = email
         self.events = events # jadwal ruangan sedang dipakai
         self.addClosedSchedule() # generate jadwal ruangan tutup
-        #self.events.sort(key = getEventKey)
+        self.events.sort(key = lambda event : event.long_start)
     def addClosedSchedule(self):
         i = sidang_period.long_start # hanya generate di masa sidang, tidak setahun penuh
-        print("dipanggil "+str(sidang_period.date_start))
-        print("sampe "+str(sidang_period.date_end))
         while (i < sidang_period.long_end):
             day = (i % weekToSecond) / dayToSecond
-            print("day "+str(day))
             if (day >= 2 and day < 4): # hari sabtu atau minggu
                 # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
-                self.events.append(Event('Libur', longtoDate(i), longtoDate(i + dayToSecond)))
+                self.events.append(Event(None, 'Libur', longToDate(i), longToDate(i + dayToSecond)))
             else: # hari senin sampe jumat
                 # ruangan tutup dari jam 6 sore sampe jam 7 besoknya
-                self.events.append(Event('Tutup', longtoDate(i + (hourToSecond * 11)), longtoDate(i + dayToSecond)))
+                self.events.append(Event(None, 'Tutup', longToDate(i + (hourToSecond * 11)), longToDate(i + dayToSecond)))
             i += dayToSecond
 
 # STRUKTUR DATA
-class Domain(object):
+class Domain():
 # class Domain sebagai domain dalam genetic algorithm
-    def __init__(self, room_id = None, event = None):
+    def __init__(self, room_id, event):
         self.room_id = room_id
         self.event = event
 
 # FUNGSI
 def isEventConflict(candidateEvent, event):
 # cek apakah event 1 (candidateEvent) dengan event 2 (event) bentrok
-    if (event.long_start >= candidateEvent.long_start and event.long_start <= candidateEvent.long_end):
+    if (event.long_start >= candidateEvent.long_start and event.long_start < candidateEvent.long_end):
         return True # bentrok, dosen bakal cabut atau ruangan bakal dipake ditengah
-    elif (event.long_end >= candidateEvent.long_start and event.long_end <= candidateEvent.long_end):
+    elif (event.long_end > candidateEvent.long_start and event.long_end <= candidateEvent.long_end):
         return True # bentrok, dosen bakal telat atau ruangan baru bisa dipake ditengah
     elif (event.long_start <= candidateEvent.long_start and event.long_end >= candidateEvent.long_end):
         return True # bentrok, dosen gabakal dateng atau ruangan full gabisa dipake
@@ -112,25 +100,27 @@ def isEventConflict(candidateEvent, event):
         return False
 
 # STRUKTUR DATA
-class Sidang(object):
+class Sidang():
 # class Sidang sebagai variable dalam genetic algorithm
-    def __init__(self, student_id = None, lecturers_id = None):
+    def __init__(self, student_id, lecturers_id = []):
         self.student_id = student_id
         self.lecturers_id = lecturers_id
         self.events = []
         self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
-        self.events.sort(key = getEventKey)
+        self.events.sort(key = lambda event : event.long_start)
         self.domains = [] # semua kemungkinan ruang&jadwal yang bisa digunakan
         self.idxDomain = -1 # hasil algoritma adalah ini, salah satu ruang&jadwal dari banyak kemungkinan tersebut
         self.searchDomains()
         self.totalDomain = self.idxDomain + 1
     def mergeEventsLecturers(self):
-        p = 1
-
+    	return
+        for lecturer_id in lecturers_id:
+            for event in lecturers_list[lecturer_id].events:
+                self.events.append(event) # gabunginnya satu satu biar gak jadi list of list
     def searchDomains(self):
         i = sidang_period.long_start
         while (i < sidang_period.long_end):
-            candidateEvent = Event('Usulan sidang ' + str(self.student_id), longtoDate(i), longtoDate(i + hourToSecond))
+            candidateEvent = Event(None, 'Usulan sidang ' + str(self.student_id), longToDate(i), longToDate(i + hourToSecond))
             # cek apakah dosen ada yang sedang sibuk
             for lecturer_event in self.events:
                 if (isEventConflict(candidateEvent, lecturer_event)):
@@ -148,27 +138,27 @@ class Sidang(object):
             i += hourToSecond # cek jadwal 1 jam berikutnya
 
 # STRUKTUR DATA
-class Student(object):
+class Student():
 # mahasiswa
 # asumsi: mahasiswa selalu siap sedia, tidak punya jadwal sibuk
-    def __init__(self, student_id = None, name = None, email = None, topic = None, dosbing_id = None):
+    def __init__(self, student_id, name = 'Foolan', email = 'foolan@gmail.com', topic = None, dosbing_id = None):
         self.student_id = student_id
         self.name = name
         self.email = email
         self.topic = topic
         self.dosbing_id = dosbing_id
-        self.sidang = Sidang(self.student_id, dosbing_id) # harusnya gak cuma dosbing, tapi semua dosen yg hadir
+        self.sidang = Sidang(student_id, dosbing_id) # harusnya gak cuma dosbing, tapi semua dosen yg hadir
 
 # FUNGSI
 def isDomainConflict(domain1, domain2):
 # cek apakah usulan sidang 1 (domain1) dengan usulan sidang 2 (domain2) bentrok
-    if (domain1.room_id == domain2.room_id and domain1.event.long_start == domain2.event.long_start):
+    if ((domain1.room_id == domain2.room_id) and isEventConflict(domain1.event, domain2.event)):
         return 1 # ruangan dan jamnya sama, berarti bentrok
     else:
         return 0
 
 # FUNGSI
-def countDomainConflicts(object):
+def countDomainConflicts():
 # menghitung berapa banyak mahasiswa yang bentrok jadwal sidangnya
     result = 0
     for student1 in students_list:
@@ -235,7 +225,7 @@ def GeneticAlgorithm(maxGeneration):
                 gen[studentMutasi] = domainMutasi
 
 # FUNGSI
-def printResult(object):
+def printResult():
 # mencetak usulan jadwal sidang
     for student in students_list:
         idxDomain = student.sidang.idxDomain
@@ -243,7 +233,7 @@ def printResult(object):
         print (student.student_id, ' pada ', domain.event.date_start, ' di ', rooms_list[domain.room_id].name)
 
 # FUNGSI
-def execGA(object):
+def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
     for gen in listGen:
         del gen[:]
@@ -253,135 +243,24 @@ def execGA(object):
     geneticAlgorithm(20)
     printResult()
 
-# MAIN PROGRAM
-# setelah data-data di load dari json jadi objek (gak ngerti gimana caranya), tinggal uncomment dibawah ini
-# execGA()
-
-print("wawaw")
-tset = "2002-07-31 00:00:05"
-print(tset)
-
-#test dateToLong
-print(dateToLong(tset))
-
-#test LongToDate
-print(longtoDate(dateToLong(tset)))
-
-# STRUKTUR DATA
-print("==========================================================")
-print("test event")
-#test create event
-myEvent = Event(1, "makan baso", '2017-05-07 07:00:00', '2017-05-07 09:00:00')
-print(myEvent.event_id)
-print(myEvent.date_start)
-print(myEvent.date_end)
-print(myEvent.name)
-print(myEvent.long_start, longtoDate(myEvent.long_start))
-print(myEvent.long_end, longtoDate(myEvent.long_end))
-print(getEventKey(myEvent))
-
-print("==========================================================")
-print("test room")
-myRoom = Room(999, "kantin", "kantin@gmail.com", [myEvent])
-print(myRoom.room_id)
-print(myRoom.name)
-print(myRoom.email)
-for myEvents in myRoom.events:
-    print(myEvents.event_id)
-    print(myEvents.date_start)
-    print(myEvents.date_end)
-    print(myEvents.name)
-    print(myEvents.long_start, longtoDate(myEvent.long_start))
-    print(myEvents.long_end, longtoDate(myEvent.long_end))
 
 
-print("==========================================================")
-print("test domain")
-myDomain = Domain(999, myEvent)
-print(myDomain.room_id)
-print(myDomain.event.event_id)
-print(myDomain.event.date_start)
-print(myDomain.event.date_end)
-print(myDomain.event.name)
-print(myDomain.event.long_start, longtoDate(myEvent.long_start))
-print(myDomain.event.long_end, longtoDate(myEvent.long_end))
-print(getEventKey(myDomain.event))
 
-print("==========================================================")
-print("test sidang")
-mySidang = Sidang(13514066, [1234567])
-print(mySidang.lecturers_id)
-print(mySidang.events)
-print(mySidang.domains)
-print(mySidang.idxDomain)
-print(mySidang.totalDomain)
 
-print("==========================================================")
-print("test student")
-myStudent = Student(13514066, "bimo", "bimo@mama.com", "AI", [1234567])
-print(myStudent.student_id)
-print(myStudent.name)
-print(myStudent.email)
-print(myStudent.topic)
-print(myStudent.dosbing_id)
 
-print("==========================================================")
-print("test isEventConflict")
-event1 = Event(111, "test1", "2017-08-10 10:00:00", "2017-08-10 12:00:00")
-event2 = Event(111, "test1", "2017-08-10 11:00:00", "2017-08-10 13:00:00")
-event3 = Event(111, "test1", "2017-08-10 09:00:00", "2017-08-10 11:00:00")
-event4 = Event(111, "test1", "2017-08-10 11:00:00", "2017-08-10 11:30:00")
-print(isEventConflict(event1, event2))
-print(isEventConflict(event1, event3))
-print(isEventConflict(event1, event4))
-print(isEventConflict(event3, event2))
-testEvent = [event1, event2, event3, event4]
 
-print("==========================================================")
-#dummy rooms_list
-room1= Room(222, "room1", "room1@gmail.com", [testEvent])
-room2= Room(333, "room2", "room2@gmail.com", [testEvent])
 
-print("test isEventConflict")
-domain1 = Domain(222, event1)
-domain2 = Domain(222, event2)
-domain3 = Domain(222, event3)
-domain4 = Domain(222, event4)
-domain5 = Domain(333, event2)
-print(isDomainConflict(domain1, domain2))
-print(isDomainConflict(domain1, domain3))
-print(isDomainConflict(domain1, domain4))
-print(isDomainConflict(domain2, domain3))
-print(isDomainConflict(domain1, domain5))
 
-print("==========================================================")
-print("test Lecturer")
-lecturer1 = Lecturer(1234567, "lec1", "lec1@email.com", ["AI", "graphic"], testEvent)
-print(lecturer1.lecturer_id)
-print(lecturer1.name)
-print(lecturer1.email)
-print(lecturer1.topics)
-print(lecturer1.events)
-lecturer2 = Lecturer(2345678, "lec2", "lec2@email.com", ["AI", "graphic"], testEvent)
-lecturer3 = Lecturer(3456789, "lec3", "lec3@email.com", ["graphic", "graphic"], testEvent)
-lecturer4 = Lecturer(4567890, "lec4", "lec4@email.com", ["graphic", "security"], testEvent)
-lecturer5 = Lecturer(5678901, "lec5", "lec5@email.com", ["game", "network"], testEvent)
 
-#dummy students_list
-student1 = Student(13514065, "bimo1", "bimo1@mama.com", "AI", [1234567, 2345678])
-student2 = Student(13514067, "bimo2", "bimo2@mama.com", "graphic", [2345678, 3456789])
-student3 = Student(13514068, "bimo3", "bimo3@mama.com", "security", [3456789])
-student4 = Student(13514069, "bimo4", "bimo4@mama.com", "game", [5678901])
-student5 = Student(13514060, "bimo5", "bimo5@mama.com", "network", [5678901])
-students_list = [student1, student2, student3, student4, student5]
 
-#countDomainConflicts(object) masih kurang variable
-# print("==========================================================")
-# print("test countDomainConflicts")
-# print(countDomainConflicts("bait"))
 
-#printResult(object) index error?
-# printResult("bait") 
+
+
+
+
+
+
+
 
 def student_data_parser(student_data):
     students = []
@@ -455,3 +334,144 @@ class Scheduler():
         result_data = create_initial_data(temp_data)
         #create data object
         return 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# MAIN PROGRAM
+# setelah data-data di load dari json jadi objek (gak ngerti gimana caranya), tinggal uncomment dibawah ini
+# execGA()
+
+# STRUKTUR DATA
+'''print("==========================================================")
+print("test event SUKSES")'''
+#test create event
+myEvent = Event(1, "makan baso", '2017-05-07 07:00:00', '2017-05-07 09:00:00')
+'''print(myEvent.event_id)
+print(myEvent.date_start)
+print(myEvent.date_end)
+print(myEvent.name)
+print(myEvent.long_start, longToDate(myEvent.long_start))
+print(myEvent.long_end, longToDate(myEvent.long_end))
+print(getEventKey(myEvent))'''
+
+'''print("==========================================================")
+print("test room SUKSES")'''
+myRoom = Room(999, "kantin", "kantin@gmail.com", [myEvent])
+'''print(myRoom.room_id)
+print(myRoom.name)
+print(myRoom.email)
+for myEvents in myRoom.events:
+    print(myEvents.event_id)
+    print(myEvents.date_start)
+    print(myEvents.date_end)
+    print(myEvents.name)
+    print(myEvents.long_start, longToDate(myEvent.long_start))
+    print(myEvents.long_end, longToDate(myEvent.long_end))'''
+
+'''print("==========================================================")
+print("test Lecturer SUKSES")'''
+lecturer1 = Lecturer(1234567, "lec1", "lec1@email.com", ["AI", "graphic"], [myEvent])
+'''print(lecturer1.lecturer_id)
+print(lecturer1.name)
+print(lecturer1.email)
+print(lecturer1.topics)
+print(lecturer1.events[0].event_id)'''
+
+'''print("==========================================================")
+print("test domain SUKSES")'''
+myDomain = Domain(999, myEvent)
+'''print(myDomain.room_id)
+print(myDomain.event.event_id)
+print(myDomain.event.date_start)
+print(myDomain.event.date_end)
+print(myDomain.event.name)
+print(myDomain.event.long_start, longToDate(myEvent.long_start))
+print(myDomain.event.long_end, longToDate(myEvent.long_end))
+print(getEventKey(myDomain.event))'''
+
+'''print("==========================================================")
+print("test sidang SUKSES")'''
+mySidang = Sidang(13514066, [1234567])
+'''print(mySidang.lecturers_id)
+print(mySidang.events)
+print(mySidang.domains)
+print(mySidang.idxDomain)
+print(mySidang.totalDomain)'''
+
+'''print("==========================================================")
+print("test student SUKSES")'''
+myStudent = Student(13514066, "bimo", "bimo@mama.com", "AI", [1234567])
+'''print(myStudent.student_id)
+print(myStudent.name)
+print(myStudent.email)
+print(myStudent.topic)
+print(myStudent.dosbing_id)'''
+
+'''print("==========================================================")
+print("test isEventConflict SUKSES")'''
+event1 = Event(111, "test1", "2017-08-10 10:00:00", "2017-08-10 12:00:00")
+event2 = Event(112, "test2", "2017-08-10 11:00:00", "2017-08-10 13:00:00")
+event3 = Event(113, "test3", "2017-08-10 09:00:00", "2017-08-10 11:00:00")
+event4 = Event(114, "test4", "2017-08-10 11:00:00", "2017-08-10 11:30:00")
+'''print(isEventConflict(event1, event2))
+print(isEventConflict(event1, event3))
+print(isEventConflict(event1, event4))
+print(isEventConflict(event3, event2))'''
+testEvent = [event1, event2, event3, event4]
+
+#dummy rooms_list
+room1= Room(222, "room1", "room1@gmail.com", testEvent)
+room2= Room(333, "room2", "room2@gmail.com", testEvent)
+
+#dummy domain list
+domain1 = Domain(222, event1)
+domain2 = Domain(222, event2)
+domain3 = Domain(222, event3)
+domain4 = Domain(222, event4)
+domain5 = Domain(333, event2)
+'''print("test isEventConflict SUKSES")
+print(isDomainConflict(domain1, domain2))
+print(isDomainConflict(domain1, domain3))
+print(isDomainConflict(domain1, domain4))
+print(isDomainConflict(domain2, domain3))
+print(isDomainConflict(domain1, domain5))'''
+
+#dummy lecturers_list
+lecturer2 = Lecturer(2345678, "lec2", "lec2@email.com", ["AI", "graphic"], testEvent)
+lecturer3 = Lecturer(3456789, "lec3", "lec3@email.com", ["graphic", "graphic"], testEvent)
+lecturer4 = Lecturer(4567890, "lec4", "lec4@email.com", ["graphic", "security"], testEvent)
+lecturer5 = Lecturer(5678901, "lec5", "lec5@email.com", ["game", "network"], testEvent)
+lecturers_list = [lecturer1, lecturer2, lecturer3, lecturer4, lecturer5]
+
+#dummy students_list
+student1 = Student(13514065, "bimo1", "bimo1@mama.com", "AI", [1234567, 2345678])
+student2 = Student(13514067, "bimo2", "bimo2@mama.com", "graphic", [2345678, 3456789])
+student3 = Student(13514068, "bimo3", "bimo3@mama.com", "security", [3456789])
+student4 = Student(13514069, "bimo4", "bimo4@mama.com", "game", [5678901])
+student5 = Student(13514060, "bimo5", "bimo5@mama.com", "network", [5678901])
+students_list = [student1, student2, student3, student4, student5]
+
+'''print("==========================================================")
+print("test countDomainConflicts BELUM")
+print(countDomainConflicts())
+printResult()
+
+print("==========================================================")
+print("test GA")'''
+# execGA("bait")
