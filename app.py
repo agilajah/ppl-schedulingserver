@@ -1,11 +1,11 @@
 # LIBRARY
 
+from __future__ import division
 from flask import Flask, jsonify, json
 from flask import request
 from flask import make_response
 from flask_restful import Api, Resource
 from flask_restful import reqparse
-from __future__ import division
 from copy import deepcopy
 from math import ceil, exp, floor
 from random import randint, seed, shuffle
