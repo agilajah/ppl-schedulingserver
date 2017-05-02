@@ -1,26 +1,25 @@
-import os
-import calendar
-
-from random import randint, shuffle, seed
-from math import ceil, floor
-from copy import deepcopy
+# LIBRARY
 
 from flask import Flask, jsonify, json
 from flask import request
 from flask import make_response
 from flask_restful import Api, Resource
 from flask_restful import reqparse
-from datetime import datetime
-# Flask app should start in global layout
-
+from __future__ import division
+from copy import deepcopy
+from math import ceil, exp, floor
+from random import randint, seed, shuffle
+import calendar
+import datetime
+import json
+import os
+import time
 
 app = Flask(__name__)
 
 api = Api(app)
 
 parser = reqparse.RequestParser()
-parser.add_argument('student_data', type=str, required=False, help='please input student data (json)', location='json')
-parser.add_argument('lecturer_data', type=str, required=False, help='please input lecturer data (json)', location='json')
 parser.add_argument('data', type=str, required=False, help='need entire data', location='json')
 
 class Home(Resource):
@@ -31,771 +30,367 @@ class Home(Resource):
     def put(self):
         return 'Hello Wolrd'
 
-
-def student_data_parser(student_data):
-    students = []
-    for i in student_data:
-        temp_student_data = student_data[i]
-        temp_student = Mahasiswa()
-        temp_student.user_id = temp_student_data['user_id']
-        temp_student.dosen_pembimbing_id = temp_student_data['id_dosen_pembimbing']
-        temp_student.first_name = temp_student_data['user_name']
-        temp_student.last_name = temp_student_data['last_name']
-        temp_student.email = temp_student_data['email']
-        temp_student.topics = temp_student_data['topics']
-        list_of_events = []
-        # create event
-        try:
-            event_json = temp_student_data['event']
-        except:
-            print("Event kosong")
-        if event_json is not None:
-            for j in event_json:
-                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
-                    event_json[j].date_end)
-                list_of_events.append(temp_event)
-
-        # now we append all of those information here
-        students.append(temp_student)
-
-    return students
-
-
-def lecturer_data_parser(lecturer_data):
-    lecturers = []
-    for i in lecturer_data:
-        temp_lecturer_data = lecturer_data[i]
-        temp_lecturer = Dosen()
-        temp_lecturer.user_id = temp_lecturer_data['user_id']
-        temp_lecturer.first_name = temp_lecturer_data['user_name']
-        temp_lecturer.last_name = temp_lecturer_data['last_name']
-        temp_lecturer.email = temp_lecturer_data['email']
-        temp_lecturer.topics = temp_lecturer_data['topics']
-        list_of_events = []
-        # create event
-        try:
-            event_json = temp_lecturer_data['event']
-        except:
-            print("Event kosong")
-        if event_json is not None:
-            for j in event_json:
-                temp_event = Event(event_json[j].name, event_json[j].event_id, event_json[j].date_start, \
-                                   event_json[j].date_end)
-                list_of_events.append(temp_event)
-
-        # now we append all of those information here
-        lecturers.append(temp_lecturer)
-
-    return lecturers
-
-def create_sessions(students_list = None, lecturers_list = None):
-    return 0
-
-def create_initial_data(temp_data = None):
-    if temp_data is None:
-        print ("We need both of student and lecturer data to proceed")
-    else:
-        # create dictionary of lists
-        data = {}
-        data['students_list'] = student_data_parser(temp_data['student_data'])
-        data['lecturers_list'] = lecturer_data_parser(temp_data['lecturer_data'])
-        # create session from given students and lecturers list
-        data['sessions_list'] = create_sessions(data['students_list'], data['lecturers_list'])
-        # process the data
-        # # Assign()
-        # Genetic()
-        # Genetic.init()
-        # Genetic.add(Assign.daftar_matkul_time)
-        # Genetic.run(100)
-        # Genetic.sort()
-#
-# def get_year():
-# 	now = datetime.datetime.now()
-# 	return now.year
-#
-# def cetak_nomor_hari():
-# 	print ("[", end='')
-# 	for i in range (1, 365):
-# 		print (i, end='')
-# 		print(", ", end='')
-# 	print (365, end='')
-# 	x = get_year()
-# 	if (calendar.isleap(x)):
-# 		print (", 366", end='')
-# 	print ("]")
-# 	return
-#
-# def number_to_date(x):
-# 	year = get_year()
-# 	date = datetime.datetime(year, 1, 1) + datetime.timedelta(x - 1)
-# 	return date
-#
-# def date_to_day(date):
-# 	day_name = date.strftime("%A")
-# 	return day_name
-
-class Data():
-    def __init__(self, students=None, lecturers=None, sessions=None):
-        self.students = students
-        self.lecturers = lecturers
-        self.sessions = sessions
-
 class Scheduler(Resource):
-    def get(self):
-        data = [
- {
-  "id" : "87623",
-  "text" : "Sidang si A",
-  "ruang" : "7602",
-  "start_date": "2017-05-01 07:00:00",
-  "end_date": "2017-05-01 08:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87624",
-  "text" : "Sidang si B",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 07:00:00",
-  "end_date": "2017-05-01 08:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87625",
-  "text" : "Sidang si C",
-  "ruang" : "7602",
-  "start_date": "2017-05-01 08:00:00",
-  "end_date": "2017-05-01 09:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87626",
-  "text" : "Sidang si D",
-  "ruang" : "7602",
-  "start_date": "2017-05-01 09:00:00",
-  "end_date": "2017-05-01 10:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87627",
-  "text" : "Sidang si E",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 08:00:00",
-  "end_date": "2017-05-01 09:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87628",
-  "text" : "Sidang si F",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 09:00:00",
-  "end_date": "2017-05-01 10:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87629",
-  "text" : "Sidang si G",
-  "ruang" : "7602",
-  "start_date": "2017-05-02 07:00:00",
-  "end_date": "2017-05-02 08:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87630",
-  "text" : "Sidang si H",
-  "ruang" : "7602",
-  "start_date": "2017-05-02 09:00:00",
-  "end_date": "2017-05-02 10:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87631",
-  "text" : "Sidang si I",
-  "ruang" : "7606",
-  "start_date": "2017-05-02 07:00:00",
-  "end_date": "2017-05-02 08:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87632",
-  "text" : "Sidang si J",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 08:00:00",
-  "end_date": "2017-05-01 09:00:00",
-  "type": "Sidang"
- }
-]
-        return jsonify({"result": data})
     def post(self):
-        # args = parser.parse_args(strict=True)
-        # data_json = {}
-        # for k, v in args.items():
-        #     if v is not None:
-        #         data_json[k] = v
-        #
-        # temp_data = json.load(data_json)
-        # # student_data = temp_data['student_data']
-        # # lecturer_data = temp_data['lecturer_data']
-        # # parse student_data
-        # # parse professor_data
-        # # the result is dictionary of lists
-        # result_data = create_initial_data(temp_data)
-        # #create data object
-        data = [
- {
-  "id" : "87623",
-  "text" : "Sidang si A",
-  "ruang" : "7602",
-  "start_date": "2017-05-01 07:00:00",
-  "end_date": "2017-05-01 08:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87624",
-  "text" : "Sidang si B",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 07:00:00",
-  "end_date": "2017-05-01 08:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87625",
-  "text" : "Sidang si C",
-  "ruang" : "7602",
-  "start_date": "2017-05-01 08:00:00",
-  "end_date": "2017-05-01 09:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87626",
-  "text" : "Sidang si D",
-  "ruang" : "7602",
-  "start_date": "2017-05-01 09:00:00",
-  "end_date": "2017-05-01 10:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87627",
-  "text" : "Sidang si E",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 08:00:00",
-  "end_date": "2017-05-01 09:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87628",
-  "text" : "Sidang si F",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 09:00:00",
-  "end_date": "2017-05-01 10:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87629",
-  "text" : "Sidang si G",
-  "ruang" : "7602",
-  "start_date": "2017-05-02 07:00:00",
-  "end_date": "2017-05-02 08:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87630",
-  "text" : "Sidang si H",
-  "ruang" : "7602",
-  "start_date": "2017-05-02 09:00:00",
-  "end_date": "2017-05-02 10:00:00",
-  "type": "Seminar"
- },
- {
-  "id" : "87631",
-  "text" : "Sidang si I",
-  "ruang" : "7606",
-  "start_date": "2017-05-02 07:00:00",
-  "end_date": "2017-05-02 08:00:00",
-  "type": "Sidang"
- },
- {
-  "id" : "87632",
-  "text" : "Sidang si J",
-  "ruang" : "7606",
-  "start_date": "2017-05-01 08:00:00",
-  "end_date": "2017-05-01 09:00:00",
-  "type": "Sidang"
- }
-]
-        return jsonify({"result": data})
+        args = parser.parse_args(strict=True)
+        unparsedData = {}
+        for k, v in args.items():
+            if v is not None:
+                unparsedData[k] = v
+        if (initData(unparsedData['data'])):
+            result = execGA()
 
+        return jsonify({'result' : result})
 
-class Ruangan(object):
-    def __init__(self, idruangan, nama, jam_awal, jam_akhir, hari):
-        self.idruangan = idruangan
-        self.nama = nama
-        self.jam_awal = jam_awal    #hapus
-        self.jam_akhir = jam_akhir	#hapus
-        self.hari = hari			#hapus
+######################################## STRUKTUR DATA ########################################
 
-
-
-class Mahasiswa(object):
-    def __init__(self, event = None, user_id = None, first_name=None, last_name = None, \
-                 email = None, topics = None, id_dosen_pembimbing= None):
-        self.event = event
-        self.user_id = user_id
-        self.email = email
-        self.dosen_pembimbing_id = id_dosen_pembimbing
-        self.first_name = first_name
-        self.last_name = last_name
-        self.topics = topics
-
-class Dosen(object):
-    def __init__(self, event = None, user_id = None, first_name=None, last_name = None, \
-                 email = None, topics = None):
-        self.event = event
-        self.user_id = user_id
-        self.email = email
-        self.first_name = first_name
-        self.last_name = last_name
-        self.topics = topics
-
-
-
-class Event(object):
-    def __init__(self, name = None, event_id = None, date_start = None, date_end = None):
+class Event():
+# kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
+    def __init__(self, eventID = None, name = 'An event', startDate = None, endDate = None):
+        self.eventID = eventID
         self.name = name
-        self.event_id = event_id
-        self.date_start = date_start
-        self.data_end = date_end
+        self.startDate = startDate
+        self.endDate = endDate
+        # tipe waktu disimpan juga dalam tipe integer supaya lebih mudah cek lebih besar/kecil nya
+        self.startLong = dateToLong(startDate)
+        self.endLong = dateToLong(endDate)
 
-class Session(object):
-    def __init__(self, session_id = None, name = None, student_id = None, lecturers_id = None, \
-                 events = None, days = None):
-        self.session_id = session_id
+class Room():
+# ruangan
+    def __init__(self, roomID = None, name = 'A room', email = 'a.room@gmail.com', events = []):
+        self.roomID = roomID
         self.name = name
-        self.student_id = student_id
-        self.lecturers_id = lecturers_id
-        self.list_of_event = events
-        self.list_of_day = days
-        self.room
+        self.email = email
+        self.events = events # jadwal ruangan sedang dipakai
+        self.addClosedSchedule() # generate jadwal ruangan tutup
+        self.events.sort(key = lambda event : event.startLong)
+    def addClosedSchedule(self):
+        # generate jam tutup dan jam libur ruangan di masa sidang
+        i = sidangPeriod.startLong
+        while (i < sidangPeriod.endLong):
+            day = (i % weekToSecond) / dayToSecond
+            if (day >= 2 and day < 4): # hari sabtu atau minggu
+                # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
+                self.events.append(Event(None, 'Libur', longToDate(i), longToDate(i + dayToSecond)))
+            else: # hari senin sampe jumat
+                # ruangan tutup dari jam 6 sore sampe jam 7 besoknya
+                self.events.append(Event(None, 'Tutup', longToDate(i + (hourToSecond * 11)), longToDate(i + dayToSecond)))
+            i += dayToSecond
 
-class Genetic:
-    inputs = []
-    result = []
+class Lecturer():
+# dosen
+    def __init__(self, lecturerID = None, name = 'Foolan', email = 'foolan@gmail.com', topics = [], events = []):
+        self.lecturerID = lecturerID
+        self.name = name
+        self.email = email
+        self.topics = topics
+        self.events = events # jadwal sibuk dosen
+        self.events.sort(key = lambda event : event.startLong)
 
-    def __init__(self):
-        if(Jadwal.total_pasangan == 0):
-            n = len(Jadwal.daftar_mata_kuliah)
-            temp_total = 0
-            for i in range(n):
-                Jadwal.total_pasangan += temp_total * Jadwal.daftar_mata_kuliah[i].sks
-                temp_total += Jadwal.daftar_mata_kuliah[i].sks
-            Jadwal.total_pasangan += 1
+class Student():
+# mahasiswa
+# asumsi: mahasiswa selalu siap sedia, tidak punya jadwal sibuk
+    def __init__(self, studentID = None, name = 'Foolan', email = 'foolan@gmail.com', topic = None, pembimbingID = [], pengujiID =[]):
+        self.studentID = studentID
+        self.name = name
+        self.email = email
+        self.topic = topic
+        self.pembimbingID = pembimbingID
+        self.pengujiID = pengujiID
+        self.sidang = Sidang(studentID, pembimbingID + pengujiID)
 
-    @classmethod
-    def convertToMatriks(self, chromosome):
-        M = Matriks(len(Jadwal.daftar_ruangan), 120)
-        idx = 0
-        for mkot in chromosome:
-
-            awal = (mkot.h_selected-1) * 24 + (mkot.j_selected)
-            for i in range(awal, awal + mkot.sks):
-                M.matriks[mkot.r_selected][i].append(Jadwal.daftar_mata_kuliah[idx].nama)
-            idx += 1
-        return M
-
-    @classmethod
-    def fitness(self, chromosome):
-        M = self.convertToMatriks(chromosome)
-        con = int(M.conflict_count())
-        return Jadwal.total_pasangan - int(M.conflict_count())
-
-    # mutate ini dilakukan abis chromosomenya digabungin
-    @classmethod
-    def random_assign(self, x):
-
-        bisa = False
-        MBaru = MatKulOnlyTime(x)
-        COMB_PER_HARI = Jadwal.daftar_mata_kuliah[x].jam_akhir - Jadwal.daftar_mata_kuliah[x].jam_awal - Jadwal.daftar_mata_kuliah[x].sks + 1
-        JUMLAH_HARI = len(Jadwal.daftar_mata_kuliah[x].hari)
-        comb_waktu = COMB_PER_HARI * JUMLAH_HARI
-        urut_waktu = []
-        for i in range(comb_waktu):
-            urut_waktu.append(i)
-
-        shuffle(urut_waktu)
-        if(Jadwal.daftar_mata_kuliah[x].ruangan == '-'):
-            urut_ruangan = []
-            comb_ruangan = len(Jadwal.daftar_ruangan)
-
-            for i in range(comb_ruangan):
-                urut_ruangan.append(i)
-
-            shuffle(urut_ruangan)
-            for ruangan_selected in urut_ruangan:
-                if bisa:
-                    break
-                for z in urut_waktu:
-                    hari_selected = Jadwal.daftar_mata_kuliah[x].hari[floor(z / COMB_PER_HARI)]
-                    jam_selected = Jadwal.daftar_mata_kuliah[x].jam_awal + (z % COMB_PER_HARI)
-                    temp_ruangan = Jadwal.daftar_ruangan[ruangan_selected]
-                    if(hari_selected in temp_ruangan.hari and jam_selected >= temp_ruangan.jam_awal and jam_selected + Jadwal.daftar_mata_kuliah[x].sks <= temp_ruangan.jam_akhir):
-                        MBaru.setTime(ruangan_selected, jam_selected, hari_selected, Jadwal.daftar_mata_kuliah[x].sks)
-                        break
+class Sidang():
+# class Sidang sebagai variable dalam genetic algorithm
+    def __init__(self, studentID = None, lecturersID = []):
+        self.studentID = studentID
+        self.lecturersID = lecturersID
+        self.events = []
+        self.mergeEventsLecturers() # gabungkan semua jadwal sibuk dosen
+        self.events.sort(key = lambda event : event.startLong)
+        self.domains = [] # semua kemungkinan ruang&jadwal yang bisa digunakan
+        self.searchDomains()
+        if (len(self.domains) == 0):
+            raise Exception('Mahasiswa ' + studentID + ' tidak mempunyai kemungkinan jadwal sidang.')
         else:
+            self.idxDomain = 0 # hasil algoritma adalah ini, salah satu ruang&jadwal dari banyak kemungkinan tersebut
+    def mergeEventsLecturers(self):
+        for lecturerID in self.lecturersID:
+            # cari dosennya
+            lecturer = None
+            for lecturerIterator in listLecturer:
+                if (lecturerIterator.lecturerID == lecturerID):
+                    lecturer = lecturerIterator
+                    break
+            # gabung jadwalnya
+            if (lecturer is not None):
+                for event in lecturer.events:
+                    self.events.append(event) # gabunginnya satu satu biar gak jadi list of list
 
-            for idxruangan in range(len(Jadwal.daftar_ruangan)):
-                assigned = False
-                if(Jadwal.daftar_ruangan[idxruangan].nama == Jadwal.daftar_mata_kuliah[x].ruangan):
-                    ruangan_selected = idxruangan
-                    for z in urut_waktu:
-                        hari_selected = Jadwal.daftar_mata_kuliah[x].hari[floor(z / COMB_PER_HARI)]
-                        jam_selected = Jadwal.daftar_mata_kuliah[x].jam_awal + (z % COMB_PER_HARI)
+    def searchDomains(self):
+        i = sidangPeriod.startLong
+        while (i < sidangPeriod.endLong):
+            candidateEvent = Event(None, 'Usulan sidang ' + str(self.studentID), longToDate(i), longToDate(i + hourToSecond))
+            # cek apakah dosen ada yang sedang sibuk
+            isConflict = False
+            for eventLecturer in self.events:
+                if (isEventConflict(candidateEvent, eventLecturer)):
+                    isConflict = True
+                    break # bentrok, cari waktu lain
+                if (eventLecturer.startLong >= candidateEvent.endLong):
+                    break # tidak perlu cek lagi event selanjutnya, pasti gak bentrok
+            if (not isConflict): # semua dosen bersedia
+                for room in listRoom:
+                    isConflict = False
+                    for eventRoom in room.events:
+                        if (isEventConflict(candidateEvent, eventRoom)):
+                            isConflict = True
+                            break # bentrok, cari ruangan lain
+                        if (eventRoom.startLong >= candidateEvent.endLong):
+                            break # tidak perlu cek lagi event selanjutnya, pasti gak bentrok
+                    if (not isConflict): # ruangan kosong
+                        self.domains.append(Domain(room.roomID, candidateEvent))
+            i += hourToSecond # cek jadwal 1 jam berikutnya
 
-                        temp_ruangan = Jadwal.daftar_ruangan[ruangan_selected]
-                        if(hari_selected in temp_ruangan.hari and jam_selected >= temp_ruangan.jam_awal and jam_selected + Jadwal.daftar_mata_kuliah[x].sks <= temp_ruangan.jam_akhir):
-                            MBaru.setTime(ruangan_selected, jam_selected, hari_selected, Jadwal.daftar_mata_kuliah[x].sks)
-                            break
-                    if assigned:
-                        break
-        return MBaru
+class Domain():
+# class Domain sebagai domain dalam genetic algorithm
+    def __init__(self, roomID, event):
+        self.roomID = roomID
+        self.event = event
 
-    @classmethod
-    def mutate(self, chromosome):
-        panjang = len(chromosome)
-        bnyk = int(ceil(panjang / 20))
-        for i in range(bnyk):
-            x = randint(0, panjang - 1)
-            chromosome[x] = self.random_assign(x)
+######################################## PROSEDUR ########################################
 
-    @classmethod
-    def selectidx(self, n, fitness_total, r_num):
-        now = 0
-        idx = 0
-        for i in range(n):
-            now += fitness_total[i]
-            if(now > r_num):
+def dateToLong(date):
+# input string tanggal sesuai format google calendar, output long
+    return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
+
+def longToDate(date):
+# input long, output string tanggal sesuai format google calendar
+    return datetime.datetime.fromtimestamp(date).strftime("%Y-%m-%d %H:%M:%S")
+
+def isEventConflict(candidateEvent, event):
+# cek apakah event 1 (candidateEvent) dengan event 2 (event) bentrok
+    if (event.startLong >= candidateEvent.startLong and event.startLong < candidateEvent.endLong):
+        return True # bentrok, dosen bakal cabut atau ruangan bakal dipake ditengah
+    elif (event.endLong > candidateEvent.startLong and event.endLong <= candidateEvent.endLong):
+        return True # bentrok, dosen bakal telat atau ruangan baru bisa dipake ditengah
+    elif (event.startLong <= candidateEvent.startLong and event.endLong >= candidateEvent.endLong):
+        return True # bentrok, dosen gabakal dateng atau ruangan full gabisa dipake
+    else:
+        return False
+
+def isDomainConflict(domain1, domain2):
+# cek apakah usulan sidang 1 (domain1) dengan usulan sidang 2 (domain2) bentrok
+    if ((domain1.roomID == domain2.roomID) and isEventConflict(domain1.event, domain2.event)):
+        return 1 # ruangan dan jamnya sama, berarti bentrok
+    else:
+        return 0
+
+def countDomainConflicts():
+# menghitung berapa banyak mahasiswa yang bentrok jadwal sidangnya
+    result = 0
+    for student1 in listStudent:
+        for student2 in listStudent:
+            # cross, kalo sama diri sendiri ya ga diitung wkwk -_-
+            if (student1.studentID != student2.studentID):
+                domain1 = student1.sidang.domains[student1.sidang.idxDomain]
+                domain2 = student2.sidang.domains[student2.sidang.idxDomain]
+                result += isDomainConflict(domain1, domain2)
+    return int(result / 2)
+
+def geneticAlgorithm(maxGeneration):
+# implementasi genetic algorithm
+    global listGen
+    global listStudent
+    fitness = [] # score fitness untuk tiap gen
+    generation = 0
+    while True:
+        generation += 1
+        # hitung fitness tiap gen
+        del fitness[:]
+        for i in range(len(listGen)):
+            # pasangkan dulu student dengan domain sesuai dengan yang ada pada gen
+            for j in range(len(listGen[i])):
+                listStudent[j].sidang.idxDomain = listGen[i][j]
+            # hitung berapa student yang konflik, fitnessnya makin kecil makin bagus
+            fitness.append(countDomainConflicts())
+            if fitness[i] == 0:
+                print "Solusi ditemukan dalam generasi ke", generation, ":"
+                return
+        # masih ada konflik di semua gen, cari gen terjelek dan terbagus
+        idxMin = fitness.index(max(fitness))
+        idxMax = fitness.index(min(fitness))
+        print "Ada", fitness[idxMax], "konflik dalam generasi ke", generation
+        # gak nemu solusi sampai generation ke-maxGeneration
+        if generation == maxGeneration:
+            # pasangkan lagi student dengan domain kepunyaan gen terbaik (fitness terkecil)
+            for i in range(len(listGen[idxMax])):
+                listStudent[i].sidang.idxDomain = listGen[idxMax][i]
+            # cetak berapa konflik
+            break # break while True
+        # lanjut ke generation selanjutnya
+        else:
+            # gen jelek timpa dengan gen bagus
+            for i in range(len(listStudent)):
+                listGen[idxMin][i] = listGen[idxMax][i]
+            # kawin silang TANPA mutasi, mulai dari idxBelah (random) sampai index terakhir
+            idxBelah = randint(1, len(listStudent) - 2)
+            for i in range(idxBelah, len(listStudent)):
+                #swap gen 0 dengan gen 1
+                temp = listGen[0][i]
+                listGen[0][i] = listGen[1][i]
+                listGen[1][i] = temp
+                #swap gen 2 dengan gen 3
+                temp = listGen[2][i]
+                listGen[2][i] = listGen[3][i]
+                listGen[3][i] = temp
+            # mutasi = student ke-studentMutasi setiap gen, domainnya berubah menjadi domainMutasi
+            for gen in listGen:
+                studentMutasi = randint(0, len(listStudent) - 1)
+                domainMutasi = randint(0, len(listStudent[studentMutasi].sidang.domains) - 1)
+                gen[studentMutasi] = domainMutasi
+
+def printResult():
+# mencetak usulan jadwal sidang
+    global listStudent
+    listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
+    listResult = []
+    for student in listStudent:
+        idxDomain = student.sidang.idxDomain
+        domain = student.sidang.domains[idxDomain]
+        # cari ruangan
+        room = None
+        for roomIterator in listRoom:
+            if (roomIterator.roomID == domain.roomID):
+                room = roomIterator
                 break
-            idx += 1
-        return idx
+        # cetak ke layar
+        print '   ', domain.event.startDate, 'di', room.name, ':', student.name
+        # data untuk cetak ke file
+        result = {"studentID" : student.studentID, "pembimbingID" : student.pembimbingID, "pengujiID" : student.pengujiID,
+            "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
+        listResult.append(result)
+    # cetak ke file
+    with open('result.json', 'w') as outfile:
+        json.dump(listResult, outfile)
 
-    @classmethod
-    def run(self, loops):
-        for xxx in range(loops):
-            print (xxx)
-            fitness_total = []
-            n = len(self.inputs)
+    return listResult
 
-            # calculate total fitness
-            for chromosome in self.inputs:
-                fitness_total.append(self.fitness(chromosome))
+def execGA():
+# inisialisasi sebelum manjalankan genetic algorithm
+    global listGen
+    try:
+        for i in range(len(listGen)):
+            del listGen[i][:]
+            # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
+            for student in listStudent:
+                listGen[i].append(randint(0, len(student.sidang.domains) - 1))
+        geneticAlgorithm(20)
+    except Exception as e:
+        print 'Error when searching solution :', e
+    else:
+        try:
+            res = printResult()
+        except Exception as e2:
+            print 'Error when displaying result :', e2
 
-            # sort based on fitness_total
-            for i in range(n):
-                for j in range(n-i-1):
-                    if (fitness_total[j] > fitness_total[j+1]):
-                        fitness_total[j], fitness_total[j+1] = fitness_total[j+1], fitness_total[j]
-                        self.inputs[j], self.inputs[j+1] = self.inputs[j+1], self.inputs[j]
+    return res
 
-            pivot = randint(1, len(Jadwal.daftar_mata_kuliah))
+def studentParser(unparsedStudents):
+    global listStudent
+    for unparsedStudent in unparsedStudents:
+        studentID = unparsedStudent['studentID']
+        name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
+        email = unparsedStudent['email']
+        topic = unparsedStudent['topics']
+        pembimbingID = unparsedStudent['pembimbingID']
+        pengujiID = unparsedStudent['pengujiID']
+        # now we append all of those information here
+        listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
 
-            # calculate the total chance
-            total_chance = 0
-            for i in range(n):
-                total_chance += fitness_total[i]
+def lecturerParser(unparsedLecturers):
+    global listLecturer
+    for unparsedLecturer in unparsedLecturers:
+        lecturerID = unparsedLecturer['lecturerID']
+        name = unparsedLecturer['name']['first'] + ' ' + unparsedLecturer['name']['last']
+        email = unparsedLecturer['email']
+        topics = unparsedLecturer['topics']
+        events = []
+        # create event
+        try:
+            listEventData = unparsedLecturer['events']
+        except:
+            print lecturerID, 'has no event.'
+        else:
+            for eventData in listEventData:
+                start = eventData['start']
+                end = eventData['end']
+                # now we append all of those information event here
+                events.append(Event(None, 'Sibuk', start, end))
+        # now we append all of those information here
+        listLecturer.append(Lecturer(lecturerID, name, email, topics, events))
 
-            self.result = []
-            for i in range(n):
-                x = self.inputs[self.selectidx(n, fitness_total, randint(0, total_chance-1))][:pivot]
-                y = self.inputs[self.selectidx(n, fitness_total, randint(0, total_chance-1))][pivot:]
-                child = x
-                child.extend(y)
-                if(n > randint(1, n*n)):
-                    self.mutate(child)
+def roomParser(unparsedRooms):
+    global listRoom
+    for unparsedRoom in unparsedRooms:
+        roomID = unparsedRoom['roomID']
+        name = unparsedRoom['name']
+        email = unparsedRoom['email']
+        events = []
+        # create event
+        try:
+            listEventData = unparsedRoom['events']
+        except:
+            print roomID, 'has no event.'
+        else:
+            for eventData in listEventData:
+                start = eventData['start']
+                end = eventData['end']
+                # now we append all of those information event here
+                events.append(Event(None, 'Dipakai', start, end))
+        # now we append all of those information here
+        listRoom.append(Room(roomID, name, email, events))
 
-                self.result.append(child)
-            self.sort()
-            self.result = deepcopy(self.result[91:])
-            self.result.extend(self.inputs)
-            self.sort()
-            self.inputs = deepcopy(self.result[10:])
+def initData(tempUnparsedData):
+    # try: # ambil data dari json
+    #     filename = 'data.json'
+    #     with open(filename) as rawData:
+    #         unparsedData = json.load(rawData)
+    # except Exception as e:
+    #     print 'Error when loading', filename, ':', e
+    #     return False
+    # else:
+    #     try: # parse data
+    #         roomParser(unparsedData['listRoom'])
+    #         lecturerParser(unparsedData['listLecturer'])
+    #         studentParser(unparsedData['listStudent'])
+    #     except Exception as e2:
+    #         print 'Error when parsing', filename, ':', e2
+    #         return False
+    #ambil dari hasil post request
+    unparsedData = json.load(tempUnparsedData)
+    try: # parse data
+        roomParser(unparsedData['listRoom'])
+        lecturerParser(unparsedData['listLecturer'])
+        studentParser(unparsedData['listStudent'])
+    except Exception as e2:
+        print 'Error when parsing', filename, ':', e2
+        return False
 
-    @classmethod
-    def init(self):
-        seed()
-        self.inputs = []
-        self.result = []
-        banyak = 100
-        n = len(Jadwal.daftar_mata_kuliah)
-        for i in range(banyak):
-            self.inputs.append([])
-            for x in range(n):
-                self.inputs[i].append(self.random_assign(x))
+    return True
 
-    @classmethod
-    def add(self, jadwal):
-        self.inputs.append(jadwal)
+######################################## VARIABLE ########################################
 
-    @classmethod
-    def best(self):
-        return self.result[-1]
+sidangPeriod = Event(None, 'Masa Sidang', '2017-07-03 07:00:00', '2017-07-03 13:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+hourToSecond = 3600 # konstanta
+dayToSecond = 86400 # konstanta
+weekToSecond = 604800 # konstanta
+listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list of idxDomain (elemennya sebanyak listStudent)
+listStudent = []
+listLecturer = []
+listRoom = []
 
-    @classmethod
-    def sort(self):
-        fitness_total = []
-        n = len(self.result)
+######################################## PROGRAM UTAMA ########################################
 
-        for chromosome in self.result:
-            fitness_total.append(self.fitness(chromosome))
-
-        for i in range(n):
-            for j in range(n-i-1):
-                if (fitness_total[j] > fitness_total[j+1]):
-                    fitness_total[j], fitness_total[j+1] = fitness_total[j+1], fitness_total[j]
-                    self.result[j], self.result[j+1] = self.result[j+1], self.result[j]
-
-
-
-class Matriks:
-    row = 0
-    col = 0
-
-    def __init__(self, r = None, c = None):
-        if r is not None:
-            self.row = r
-        if c is not None:
-            self.col = c
-
-        self.matriks = []
-        for i in range(self.row):
-            self.matriks.append([])
-            for j in range(self.col):
-                self.matriks[i].append([])
-
-
-    def conflict_count(self):
-        total = 0
-        for ruang in self.matriks:
-            for jam in ruang:
-                cnt = len(jam)
-                total += cnt * (cnt-1) / 2
-        return total
-
-    def __str__(self):
-        return (str(self.row) + ' ' + str(self.col) + ' ' + str(self.matriks))
-
-
-
-class MatKulOnlyTime:
-    def __init__(self, idmatkul):
-        self.idmatkul = idmatkul
-        self.r_selected = -1
-        self.j_selected = -1
-        self.h_selected = -1
-        self.sks = -1
-
-    def setTime(self, r, j, h, s):
-        self.r_selected = int(r)
-        self.j_selected = int(j)
-        self.h_selected = int(h)
-        self.sks = int(s)
-
-    def __str__(self):
-        return "Ruang : " + str(self.r_selected) + '\nHari : ' + str(self.h_selected) + '\nJam Mulai : ' + str(self.j_selected) + '\nSKS : ' + str(self.sks)
-
-
-
-class MatKul:
-    def __init__(self, idmatkul, nama, ruangan, awal, akhir, sks, hari):
-        self.idmatkul = idmatkul
-        self.nama = nama
-        self.ruangan = ruangan
-        self.jam_awal = awal
-        self.jam_akhir = akhir
-        self.sks = sks
-        self.hari = hari
-
-
-
-class Jadwal:
-    daftar_ruangan = []
-    daftar_mata_kuliah = []
-    total_pasangan = 0
-
-    @classmethod
-    def process_ruangan_dan_mata_kuliah(self, ruangan_raw, mata_kuliah_raw):
-        idruangan = 0
-        for ruangan in ruangan_raw:
-            temp = ruangan.split(';')
-            temp[3] = temp[3].split(',')
-            for i in range(len(temp[3])):
-                temp[3][i] = int(temp[3][i])
-            temp_ruangan = Ruangan(idruangan,temp[0], int(float(temp[1])), int(float(temp[2])), temp[3])
-            idruangan += 1
-            self.daftar_ruangan.append(temp_ruangan)
-
-        idmatkul = 0
-        for mata_kuliah in mata_kuliah_raw:
-            temp = mata_kuliah.split(';')
-            temp[5] = temp[5].split(',')
-            for i in range(len(temp[5])):
-                temp[5][i] = int(temp[5][i])
-            temp_mata_kuliah = MatKul(idmatkul, temp[0], temp[1], int(float(temp[2])), int(float(temp[3])), int(temp[4]), temp[5])
-            idmatkul += 1
-            self.daftar_mata_kuliah.append(temp_mata_kuliah)
-
-        n = len(self.daftar_mata_kuliah)
-        temp_total = 0
-        for i in range(0,n):
-            self.total_pasangan += temp_total * self.daftar_mata_kuliah[i].sks
-            temp_total += self.daftar_mata_kuliah[i].sks
-        self.total_pasangan += 1
-
-    @classmethod
-    def read_file(self,ruangan_raw, mata_kuliah_raw, nama_file):
-        f = open(nama_file, "r")
-        mylist = f.read().splitlines()
-        ruangan_loaded = False
-        for line in mylist:
-            if line == 'Ruangan' or line == '':
-                pass
-            elif line == 'Jadwal':
-                ruangan_loaded = True
-            elif not ruangan_loaded:
-                ruangan_raw.append(line)
-            else:
-                mata_kuliah_raw.append(line)
-        f.close()
-
-    @classmethod
-    def init_file(self,nama_file):
-        ruangan_raw = []
-        mata_kuliah_raw = []
-        self.read_file(ruangan_raw, mata_kuliah_raw, nama_file)
-        self.process_ruangan_dan_mata_kuliah(ruangan_raw, mata_kuliah_raw)
-
-    @classmethod
-    def __init__(self, nama_file):
-        self.daftar_ruangan = []
-        self.daftar_mata_kuliah = []
-        self.init_file(nama_file)
-
-
-
-class Assign:
-	daftar_matkul_time = []
-
-	@classmethod
-	def hitung_kosong(cls, ruang, jam_awal, jam_akhir):
-		selisih = jam_akhir - jam_awal
-		hitung = 0
-		for i in range(selisih):
-			if len(cls.matriks.matriks[ruang][jam_awal+i]) == 0:
-				hitung += 1
-		return hitung
-
-	@classmethod
-	def min_kosong(cls, daftar):
-		minim = 0
-		for i in range(len(daftar)):
-			if daftar[i] < daftar[minim]:
-				minim = i
-		return minim
-
-	@classmethod
-	def cariruang(cls, matkul):
-		daftar_temp = []
-		daftar_kosong = []
-		temp_matkul_time = MatKulOnlyTime(matkul.idmatkul)
-		if matkul.ruangan != '-': # ruangan udah ditentuin
-			# tambahin looping aja didepannya
-			for ruangan in Jadwal.daftar_ruangan:
-				if ruangan.nama != matkul.ruangan:
-					continue
-				idx = ruangan.idruangan
-				ruang = Jadwal.daftar_ruangan[idx]
-				for hari in matkul.hari:
-					for haris in ruang.hari:
-						if hari == haris:
-							if max(matkul.jam_awal, ruang.jam_awal) + matkul.sks <= min(matkul.jam_akhir, ruang.jam_akhir):
-								temp_matkul_time.setTime(idx, max(matkul.jam_awal, ruang.jam_awal), hari, matkul.sks)
-								kosong = cls.hitung_kosong(temp_matkul_time.r_selected, temp_matkul_time.j_selected, min(matkul.jam_akhir, ruang.jam_akhir))
-								kosong = kosong - matkul.sks
-								if kosong < 0:
-									kosong = abs(kosong) + 100
-								daftar_kosong.append(kosong)
-								temp_masukin = deepcopy(temp_matkul_time)
-								daftar_temp.append(temp_masukin)
-
-		else:
-			n = len(Jadwal.daftar_ruangan)
-			for idx in range(n):
-				ruang = Jadwal.daftar_ruangan[idx]
-				for hari in matkul.hari:
-					for haris in ruang.hari:
-						if hari == haris:
-							if max(matkul.jam_awal, ruang.jam_awal) + matkul.sks <= min(matkul.jam_akhir, ruang.jam_akhir):
-								temp_matkul_time.setTime(idx, max(matkul.jam_awal, ruang.jam_awal), hari, matkul.sks)
-								kosong = cls.hitung_kosong(temp_matkul_time.r_selected, temp_matkul_time.j_selected, min(matkul.jam_akhir, ruang.jam_akhir))
-								kosong = kosong - matkul.sks
-								if kosong < 0:
-									kosong = abs(kosong) + 100
-								daftar_kosong.append(kosong)
-								temp_masukin = deepcopy(temp_matkul_time)
-								daftar_temp.append(temp_masukin)
-		if(len(daftar_temp) == 0):
-			cls.daftar_remove.append(matkul)
-		else:
-			minim = cls.min_kosong(daftar_kosong)
-			temp_matkul_time_final = daftar_temp[minim]
-			cls.daftar_matkul_time.append(temp_matkul_time_final)
-
-			c = (temp_matkul_time_final.h_selected - 1) * 24 + temp_matkul_time_final.j_selected
-			for i in range(temp_matkul_time_final.sks):
-				tempmatkul = deepcopy(matkul)
-				cls.matriks.matriks[temp_matkul_time_final.r_selected][c+i].append(tempmatkul)
-
-	@classmethod
-	def __init__(cls):
-		cls.daftar_remove = []
-		cls.matriks = Matriks(len(Jadwal.daftar_ruangan), 120)
-		cls.daftar_matkul_time = []
-		for matkul in Jadwal.daftar_mata_kuliah:
-			cls.cariruang(matkul)
-
-		for matkul in cls.daftar_remove:
-			Jadwal.daftar_mata_kuliah.remove(matkul)
-
-		cnt = 0
-		for matkul in Jadwal.daftar_mata_kuliah:
-			matkul.idmatkul = cnt
-			cnt += 1
-
-
-#
-# Jadwal('SourcePythonTubesAIRadit/Testcases/m1_abnormal.txt')
-# Assign()
-# Genetic()
-# Genetic.init()
-# Genetic.add(Assign.daftar_matkul_time)
-# Genetic.run(100)
-# Genetic.sort()
-# M = Genetic.convertToMatriks(Genetic.best())
-# for i in range(M.row):
-# 	for j in range(7,18,1):
-# 		print (M.matriks[i][j], end='')
-# 	print()
-# 	for j in range(31,42,1):
-# 		print (M.matriks[i][j], end='')
-# 	print()
-# 	for j in range(55,66,1):
-# 		print (M.matriks[i][j], end='')
-# 	print()
-# 	for j in range(79,90,1):
-# 		print (M.matriks[i][j], end='')
-# 	print()
-# 	for j in range(103,114,1):
-# 		print (M.matriks[i][j], end='')
-# 	print()
-# 	print()
-#
 
 api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
 api.add_resource(Home, '/', endpoint = "home")
