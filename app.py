@@ -14,6 +14,7 @@ import datetime
 import json
 import os
 import time
+import ast
 
 app = Flask(__name__)
 
@@ -37,6 +38,7 @@ class Scheduler(Resource):
         for k, v in args.items():
             if v is not None:
                 unparsedData[k] = v
+        result = "failed"
         if (initData(unparsedData['data'])):
             result = execGA()
 
@@ -284,6 +286,7 @@ def execGA():
             # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
             for student in listStudent:
                 listGen[i].append(randint(0, len(student.sidang.domains) - 1))
+        print "wawa"
         geneticAlgorithm(20)
     except Exception as e:
         print 'Error when searching solution :', e
@@ -367,15 +370,19 @@ def initData(tempUnparsedData):
     #         print 'Error when parsing', filename, ':', e2
     #         return False
     #ambil dari hasil post request
-    unparsedData = json.load(tempUnparsedData)
+
+    unparsedData = ast.literal_eval(tempUnparsedData)
     try: # parse data
+        print "wiwi"
+        print unparsedData["listRoom"]
         roomParser(unparsedData['listRoom'])
         lecturerParser(unparsedData['listLecturer'])
         studentParser(unparsedData['listStudent'])
     except Exception as e2:
-        print 'Error when parsing', filename, ':', e2
+        print 'Error when parsing :', e2
         return False
 
+    
     return True
 
 ######################################## VARIABLE ########################################
