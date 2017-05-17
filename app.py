@@ -374,10 +374,11 @@ def initData(tempUnparsedData):
     unparsedData = ast.literal_eval(tempUnparsedData)
     try: # parse data
         print "wiwi"
-        print unparsedData["listRoom"]
-        roomParser(unparsedData['listRoom'])
-        lecturerParser(unparsedData['listLecturer'])
-        studentParser(unparsedData['listStudent'])
+        print unparsedData['data']
+        print unparsedData['data']["listRoom"]
+        roomParser(unparsedData['data']['listRoom'])
+        lecturerParser(unparsedData['data']['listLecturer'])
+        studentParser(unparsedData['data']['listStudent'])
     except Exception as e2:
         print 'Error when parsing :', e2
         return False
