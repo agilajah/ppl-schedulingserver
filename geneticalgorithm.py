@@ -331,7 +331,7 @@ def initFirebase():
     dataFirebase = firebase.database()
 
 def initData():
-    try: # ambil data dari json
+    try: # ambil data dari firebase
         initFirebase()
         unparsedData = dataFirebase.get().val()['raw']
     except Exception as e:
