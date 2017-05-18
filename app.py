@@ -1,9 +1,7 @@
 # LIBRARY
-
 from __future__ import division
 from flask import Flask
 from flask_restful import Api, Resource
-from flask_restful import reqparse
 from random import randint
 import datetime
 import json
@@ -11,28 +9,26 @@ import os
 import pyrebase
 import time
 
-app = Flask(__name__)
-
-api = Api(app)
+######################################## HANDLER ########################################
 
 class Home(Resource):
-    def post(self):
-        return 'Hello World'
     def get(self):
-        return 'Hello World'
-    def put(self):
-        return 'Hello Wolrd'
+        return 'OK'
+    def post(self):
+        return self.get()
 
 class Scheduler(Resource):
+    def get(self):
+        try:
+            connectFirebase()
+            parseDatabase()
+            runGA()
+            saveResult()
+            return 'OK'
+        except Exception as e:
+            return e
     def post(self):
-        result = ''
-        if (initData()):
-            try:
-                execGA()
-                result = 'success'
-            except Exception as e:
-                result = e
-        return result
+        return self.get()
 
 ######################################## STRUKTUR DATA ########################################
 
@@ -140,7 +136,7 @@ class Sidang():
                             break # tidak perlu cek lagi event selanjutnya, pasti gak bentrok
                     if (not isConflict): # ruangan kosong
                         self.domains.append(Domain(room.roomID, candidateEvent))
-            i += hourToSecond # cek jadwal 1 jam berikutnya
+            i += fortyMinutesToSecond # cek jadwal 1 sesi (40 menit) berikutnya
 
 class Domain():
 # class Domain sebagai domain dalam genetic algorithm
@@ -240,6 +236,19 @@ def geneticAlgorithm(maxGeneration):
                 domainMutasi = randint(0, len(listStudent[studentMutasi].sidang.domains) - 1)
                 gen[studentMutasi] = domainMutasi
 
+def runGA():
+# inisialisasi sebelum manjalankan genetic algorithm
+    global listGen
+    try:
+        for i in range(len(listGen)):
+            del listGen[i][:]
+            # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
+            for student in listStudent:
+                listGen[i].append(randint(0, len(student.sidang.domains) - 1))
+        geneticAlgorithm(20)
+    except Exception as e:
+        raise Exception('Failed to get solution: ' + str(e))
+
 def saveResult():
 # mencetak usulan jadwal sidang
     global listStudent
@@ -261,26 +270,15 @@ def saveResult():
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
     # upload ke firebase
-    dataFirebase.child('result').remove(tokenFirebase)
-    dataFirebase.child('result').set(listResult, tokenFirebase)
-
-def execGA():
-# inisialisasi sebelum manjalankan genetic algorithm
-    global listGen
     try:
-        for i in range(len(listGen)):
-            del listGen[i][:]
-            # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
-            for student in listStudent:
-                listGen[i].append(randint(0, len(student.sidang.domains) - 1))
-        geneticAlgorithm(20)
+        dbFirebase.child('result').remove(tokenFirebase)
+        dbFirebase.child('result').set(listResult, tokenFirebase)
     except Exception as e:
-        print 'Error when searching solution :', e
-    else:
-        try:
-            saveResult()
-        except Exception as e2:
-            print 'Error when displaying result :', e2
+        raise Exception('Failed to upload result to Firebase: ' + str(e))
+
+def periodParser(unparsedPeriod):
+    global sidangPeriod
+    sidangPeriod = Event(None, 'Masa Sidang', unparsedPeriod['start'], unparsedPeriod['end'])
 
 def studentParser(unparsedStudents):
     global listStudent
@@ -340,12 +338,8 @@ def roomParser(unparsedRooms):
         # now we append all of those information here
         listRoom.append(Room(roomID, name, email, events))
 
-def periodParser(unparsedPeriod):
-    global sidangPeriod
-    sidangPeriod = Event(None, 'Masa Sidang', unparsedPeriod['start'], unparsedPeriod['end'])
-
-def initFirebase():
-    global dataFirebase
+def connectFirebase():
+    global dbFirebase
     global tokenFirebase
     config = {
       "apiKey": "AIzaSyBDd1cTxxIAjK-MsJu3d6bLJdAe_I3M0nk",
@@ -354,37 +348,31 @@ def initFirebase():
       "storageBucket": "ppl-scheduling.appspot.com",
       "serviceAccount": "serviceAccountKey.json"
     }
-    firebase = pyrebase.initialize_app(config)
-    auth = firebase.auth()
     email = '13514052@std.stei.itb.ac.id'
     password = 'PPL-K2E'
-    user = auth.sign_in_with_email_and_password(email, password)
-    tokenFirebase = user['idToken']
-    dataFirebase = firebase.database()
-
-def initData():
     try: # ambil data dari firebase
-        initFirebase()
-        unparsedData = dataFirebase.get().val()['raw']
+        firebase = pyrebase.initialize_app(config)
+        tokenFirebase = firebase.auth().sign_in_with_email_and_password(email, password)['idToken']
+        dbFirebase = firebase.database()
     except Exception as e:
-        print 'Error when loading data:', e
-        return False
-    else:
-        try: # parse data
-            periodParser(unparsedData['period'])
-            roomParser(unparsedData['listRoom'])
-            lecturerParser(unparsedData['listLecturer'])
-            studentParser(unparsedData['listStudent'])
-        except Exception as e2:
-            print 'Error when parsing data:', e2
-            return False
-    return True
+        raise Exception('Failed to connect to Firebase: ' + str(e))
+
+def parseDatabase():
+    try: # parse data
+        unparsedData = dbFirebase.child('raw').get()
+        periodParser(unparsedData['period'])
+        roomParser(unparsedData['listRoom'])
+        lecturerParser(unparsedData['listLecturer'])
+        studentParser(unparsedData['listStudent'])
+    except Exception as e:
+        raise Exception('Failed to parse data from Firebase: ' + str(e))
 
 ######################################## VARIABLE ########################################
 
-dataFirebase = None
+dbFirebase = None
 tokenFirebase = ''
 sidangPeriod = None
+fortyMinutesToSecond = 2400 # konstanta
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
@@ -392,12 +380,15 @@ listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list o
 listStudent = []
 listLecturer = []
 listRoom = []
+flask = Flask(__name__)
+api = Api(flask)
 
 ######################################## PROGRAM UTAMA ########################################
 
-api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
 api.add_resource(Home, '/', endpoint = "home")
+api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
+
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port %d" % port)
-    app.run(debug=False, port=port, host='0.0.0.0')
+    flask.run(debug=False, port=port, host='0.0.0.0')
