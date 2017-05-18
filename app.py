@@ -22,11 +22,11 @@ class Scheduler(Resource):
         try:
             connectFirebase()
             parseDatabase()
-            runGA()
+            result = runGA()
             saveResult()
-            return 'OK'
+            return result
         except Exception as e:
-            return e
+            return str(e)
     def post(self):
         return self.get()
 
@@ -201,7 +201,7 @@ def geneticAlgorithm(maxGeneration):
             # hitung berapa student yang konflik, fitnessnya makin kecil makin bagus
             fitness.append(countDomainConflicts())
             if fitness[i] == 0:
-                return "Solusi ditemukan dalam generasi ke " + generation
+                return "Solusi ditemukan dalam generasi ke " + str(generation)
         # masih ada konflik di semua gen, cari gen terjelek dan terbagus
         idxMin = fitness.index(max(fitness))
         idxMax = fitness.index(min(fitness))
@@ -210,7 +210,7 @@ def geneticAlgorithm(maxGeneration):
             # pasangkan lagi student dengan domain kepunyaan gen terbaik (fitness terkecil)
             for i in range(len(listGen[idxMax])):
                 listStudent[i].sidang.idxDomain = listGen[idxMax][i]
-            return "Tidak ditemukan solusi dalam " + generation + " generasi"
+            return "Tidak ditemukan solusi dalam " + str(generation) + " generasi"
         # lanjut ke generation selanjutnya
         else:
             # gen jelek timpa dengan gen bagus
@@ -242,7 +242,7 @@ def runGA():
             # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
             for student in listStudent:
                 listGen[i].append(randint(0, len(student.sidang.domains) - 1))
-        geneticAlgorithm(20)
+        return geneticAlgorithm(20)
     except Exception as e:
         raise Exception('Failed to get solution: ' + str(e))
 
