@@ -34,10 +34,11 @@ class Home(Resource):
 
 class Scheduler(Resource):
     def post(self):
-        result = "failed"
+        result = ''
         if (initData()):
             try:
                 execGA()
+                result = 'success'
             except Exception as e:
                 result = e
         return result
