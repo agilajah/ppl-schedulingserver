@@ -1,28 +1,19 @@
 # LIBRARY
 
 from __future__ import division
-from flask import Flask, jsonify, json
-from flask import request
-from flask import make_response
+from flask import Flask
 from flask_restful import Api, Resource
 from flask_restful import reqparse
-from copy import deepcopy
-from math import ceil, exp, floor
-from random import randint, seed, shuffle
-import calendar
+from random import randint
 import datetime
 import json
 import os
 import pyrebase
 import time
-import ast
 
 app = Flask(__name__)
 
 api = Api(app)
-
-parser = reqparse.RequestParser()
-parser.add_argument('data', type=str, required=False, help='need entire data', location='json')
 
 class Home(Resource):
     def post(self):
