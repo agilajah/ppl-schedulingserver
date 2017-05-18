@@ -1,10 +1,46 @@
 # LIBRARY
+
+from flask import Flask, jsonify, json
+from flask import request
+from flask import make_response
+from flask_restful import Api, Resource
+from flask_restful import reqparse
 from __future__ import division
-from random import randint
+from copy import deepcopy
+from math import ceil, exp, floor
+from random import randint, seed, shuffle
+import calendar
 import datetime
 import json
-import pyrebase
+import os
 import time
+
+app = Flask(__name__)
+
+api = Api(app)
+
+parser = reqparse.RequestParser()
+parser.add_argument('data', type=str, required=False, help='need entire data', location='json')
+
+class Home(Resource):
+    def post(self):
+        return 'Hello World'
+    def get(self):
+        return 'Hello World'
+    def put(self):
+        return 'Hello Wolrd'
+
+class Scheduler(Resource):
+    def post(self):
+        args = parser.parse_args(strict=True)
+        unparsedData = {}
+        for k, v in args.items():
+            if v is not None:
+                unparsedData[k] = v
+        if (initData(unparsedData['data'])):
+            result = execGA()
+
+        return jsonify({'result' : result})
 
 ######################################## STRUKTUR DATA ########################################
 
@@ -89,6 +125,7 @@ class Sidang():
             if (lecturer is not None):
                 for event in lecturer.events:
                     self.events.append(event) # gabunginnya satu satu biar gak jadi list of list
+
     def searchDomains(self):
         i = sidangPeriod.startLong
         while (i < sidangPeriod.endLong):
@@ -212,7 +249,7 @@ def geneticAlgorithm(maxGeneration):
                 domainMutasi = randint(0, len(listStudent[studentMutasi].sidang.domains) - 1)
                 gen[studentMutasi] = domainMutasi
 
-def saveResult():
+def printResult():
 # mencetak usulan jadwal sidang
     global listStudent
     listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
@@ -228,14 +265,15 @@ def saveResult():
                 break
         # cetak ke layar
         print '   ', domain.event.startDate, 'di', room.name, ':', student.name
-        # data untuk upload ke firebase
+        # data untuk cetak ke file
         result = {"studentID" : student.studentID, "pembimbingID" : student.pembimbingID, "pengujiID" : student.pengujiID,
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
-    # upload ke firebase
-    dataFirebase.child('result').remove(tokenFirebase)
-    dataFirebase.child('result').set(listResult, tokenFirebase)
-    del listResult[:]
+    # cetak ke file
+    with open('result.json', 'w') as outfile:
+        json.dump(listResult, outfile)
+
+    return listResult
 
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
@@ -251,9 +289,11 @@ def execGA():
         print 'Error when searching solution :', e
     else:
         try:
-            saveResult()
+            res = printResult()
         except Exception as e2:
             print 'Error when displaying result :', e2
+
+    return res
 
 def studentParser(unparsedStudents):
     global listStudent
@@ -310,51 +350,37 @@ def roomParser(unparsedRooms):
         # now we append all of those information here
         listRoom.append(Room(roomID, name, email, events))
 
-def periodParser(unparsedPeriod):
-    global sidangPeriod
-    sidangPeriod = Event(None, 'Masa Sidang', unparsedPeriod['start'], unparsedPeriod['end'])
-
-def initFirebase():
-    global dataFirebase
-    global tokenFirebase
-    config = {
-      "apiKey": "AIzaSyBDd1cTxxIAjK-MsJu3d6bLJdAe_I3M0nk",
-      "authDomain": "console.firebase.google.com/project/ppl-scheduling",
-      "databaseURL": "https://ppl-scheduling.firebaseio.com",
-      "storageBucket": "ppl-scheduling.appspot.com",
-      "serviceAccount": "serviceAccountKey.json"
-    }
-    firebase = pyrebase.initialize_app(config)
-    auth = firebase.auth()
-    email = '13514052@std.stei.itb.ac.id'
-    password = 'PPL-K2E'
-    user = auth.sign_in_with_email_and_password(email, password)
-    tokenFirebase = user['idToken']
-    dataFirebase = firebase.database()
-
-def initData():
-    try: # ambil data dari firebase
-        initFirebase()
-        unparsedData = dataFirebase.get().val()['raw']
-    except Exception as e:
-        print 'Error when loading data:', e
+def initData(tempUnparsedData):
+    # try: # ambil data dari json
+    #     filename = 'data.json'
+    #     with open(filename) as rawData:
+    #         unparsedData = json.load(rawData)
+    # except Exception as e:
+    #     print 'Error when loading', filename, ':', e
+    #     return False
+    # else:
+    #     try: # parse data
+    #         roomParser(unparsedData['listRoom'])
+    #         lecturerParser(unparsedData['listLecturer'])
+    #         studentParser(unparsedData['listStudent'])
+    #     except Exception as e2:
+    #         print 'Error when parsing', filename, ':', e2
+    #         return False
+    #ambil dari hasil post request
+    unparsedData = json.load(tempUnparsedData)
+    try: # parse data
+        roomParser(unparsedData['listRoom'])
+        lecturerParser(unparsedData['listLecturer'])
+        studentParser(unparsedData['listStudent'])
+    except Exception as e2:
+        print 'Error when parsing', filename, ':', e2
         return False
-    else:
-        try: # parse data
-            periodParser(unparsedData['period'])
-            roomParser(unparsedData['listRoom'])
-            lecturerParser(unparsedData['listLecturer'])
-            studentParser(unparsedData['listStudent'])
-        except Exception as e2:
-            print 'Error when parsing data:', e2
-            return False
+
     return True
 
 ######################################## VARIABLE ########################################
 
-dataFirebase = None
-tokenFirebase = ''
-sidangPeriod = None
+sidangPeriod = Event(None, 'Masa Sidang', '2017-07-03 07:00:00', '2017-07-03 13:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
@@ -365,5 +391,13 @@ listRoom = []
 
 ######################################## PROGRAM UTAMA ########################################
 
-if (initData()):
-    execGA()
+
+api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
+api.add_resource(Home, '/', endpoint = "home")
+
+if __name__ == "__main__":
+    port = int(os.getenv('PORT', 5000))
+
+    print("Starting app on port %d" % port)
+
+    app.run(debug=False, port=port, host='0.0.0.0')
