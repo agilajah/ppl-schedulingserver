@@ -1,12 +1,9 @@
 # LIBRARY
 from __future__ import division
-from copy import deepcopy
-from math import ceil, exp, floor
-from random import randint, seed, shuffle
-import calendar
+from random import randint
 import datetime
 import json
-import os
+import pyrebase
 import time
 
 ######################################## STRUKTUR DATA ########################################
@@ -215,7 +212,7 @@ def geneticAlgorithm(maxGeneration):
                 domainMutasi = randint(0, len(listStudent[studentMutasi].sidang.domains) - 1)
                 gen[studentMutasi] = domainMutasi
 
-def printResult():
+def saveResult():
 # mencetak usulan jadwal sidang
     global listStudent
     listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
@@ -231,13 +228,12 @@ def printResult():
                 break
         # cetak ke layar
         print '   ', domain.event.startDate, 'di', room.name, ':', student.name
-        # data untuk cetak ke file
+        # data untuk upload ke firebase
         result = {"studentID" : student.studentID, "pembimbingID" : student.pembimbingID, "pengujiID" : student.pengujiID,
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
-    # cetak ke file
-    with open('result.json', 'w') as outfile:
-        json.dump(listResult, outfile)
+    # upload ke firebase
+    dataFirebase.child('result').set(listResult, tokenFirebase)
 
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
@@ -253,7 +249,7 @@ def execGA():
         print 'Error when searching solution :', e
     else:
         try:
-            printResult()
+            saveResult()
         except Exception as e2:
             print 'Error when displaying result :', e2
 
@@ -312,27 +308,51 @@ def roomParser(unparsedRooms):
         # now we append all of those information here
         listRoom.append(Room(roomID, name, email, events))
 
+def periodParser(unparsedPeriod):
+    global sidangPeriod
+    sidangPeriod = Event(None, 'Masa Sidang', unparsedPeriod['start'], unparsedPeriod['end'])
+
+def initFirebase():
+    global dataFirebase
+    global tokenFirebase
+    config = {
+      "apiKey": "AIzaSyBDd1cTxxIAjK-MsJu3d6bLJdAe_I3M0nk",
+      "authDomain": "console.firebase.google.com/project/ppl-scheduling",
+      "databaseURL": "https://ppl-scheduling.firebaseio.com",
+      "storageBucket": "ppl-scheduling.appspot.com",
+      "serviceAccount": "serviceAccountKey.json"
+    }
+    firebase = pyrebase.initialize_app(config)
+    auth = firebase.auth()
+    email = '13514052@std.stei.itb.ac.id'
+    password = 'PPL-K2E'
+    user = auth.sign_in_with_email_and_password(email, password)
+    tokenFirebase = user['idToken']
+    dataFirebase = firebase.database()
+
 def initData():
     try: # ambil data dari json
-        filename = 'data.json'
-        with open(filename) as rawData:
-            unparsedData = json.load(rawData)
+        initFirebase()
+        unparsedData = dataFirebase.get().val()['raw']
     except Exception as e:
-        print 'Error when loading', filename, ':', e
+        print 'Error when loading data:', e
         return False
     else:
         try: # parse data
+            periodParser(unparsedData['period'])
             roomParser(unparsedData['listRoom'])
             lecturerParser(unparsedData['listLecturer'])
             studentParser(unparsedData['listStudent'])
         except Exception as e2:
-            print 'Error when parsing', filename, ':', e2
+            print 'Error when parsing data:', e2
             return False
     return True
 
 ######################################## VARIABLE ########################################
 
-sidangPeriod = Event(None, 'Masa Sidang', '2017-07-03 07:00:00', '2017-07-07 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+dataFirebase = None
+tokenFirebase = ''
+sidangPeriod = None
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
