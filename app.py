@@ -363,7 +363,7 @@ api = Api(flask)
 ######################################## PROGRAM UTAMA ########################################
 
 api.add_resource(Home, '/', endpoint = "home")
-api.add_resource(Scheduler, '/ppl-scheduling/api/v1/scheduler/')
+api.add_resource(Scheduler, '/schedule')
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
