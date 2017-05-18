@@ -201,19 +201,16 @@ def geneticAlgorithm(maxGeneration):
             # hitung berapa student yang konflik, fitnessnya makin kecil makin bagus
             fitness.append(countDomainConflicts())
             if fitness[i] == 0:
-                print "Solusi ditemukan dalam generasi ke", generation, ":"
-                return
+                return "Solusi ditemukan dalam generasi ke " + generation
         # masih ada konflik di semua gen, cari gen terjelek dan terbagus
         idxMin = fitness.index(max(fitness))
         idxMax = fitness.index(min(fitness))
-        print "Ada", fitness[idxMax], "konflik dalam generasi ke", generation
         # gak nemu solusi sampai generation ke-maxGeneration
         if generation == maxGeneration:
             # pasangkan lagi student dengan domain kepunyaan gen terbaik (fitness terkecil)
             for i in range(len(listGen[idxMax])):
                 listStudent[i].sidang.idxDomain = listGen[idxMax][i]
-            # cetak berapa konflik
-            break # break while True
+            return "Tidak ditemukan solusi dalam " + generation + " generasi"
         # lanjut ke generation selanjutnya
         else:
             # gen jelek timpa dengan gen bagus
@@ -263,8 +260,6 @@ def saveResult():
             if (roomIterator.roomID == domain.roomID):
                 room = roomIterator
                 break
-        # cetak ke layar
-        print '   ', domain.event.startDate, 'di', room.name, ':', student.name
         # data untuk upload ke firebase
         result = {"studentID" : student.studentID, "pembimbingID" : student.pembimbingID, "pengujiID" : student.pengujiID,
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
@@ -302,17 +297,8 @@ def lecturerParser(unparsedLecturers):
         email = unparsedLecturer['email']
         topics = unparsedLecturer['topics']
         events = []
-        # create event
-        try:
-            listEventData = unparsedLecturer['events']
-        except:
-            print lecturerID, 'has no event.'
-        else:
-            for eventData in listEventData:
-                start = eventData['start']
-                end = eventData['end']
-                # now we append all of those information event here
-                events.append(Event(None, 'Sibuk', start, end))
+        for event in unparsedLecturer['events']:
+            events.append(Event(None, 'Sibuk', event['start'], event['end']))
         # now we append all of those information here
         listLecturer.append(Lecturer(lecturerID, name, email, topics, events))
 
@@ -324,17 +310,8 @@ def roomParser(unparsedRooms):
         name = unparsedRoom['name']
         email = unparsedRoom['email']
         events = []
-        # create event
-        try:
-            listEventData = unparsedRoom['events']
-        except:
-            print roomID, 'has no event.'
-        else:
-            for eventData in listEventData:
-                start = eventData['start']
-                end = eventData['end']
-                # now we append all of those information event here
-                events.append(Event(None, 'Dipakai', start, end))
+        for event in unparsedRoom['events']:
+            events.append(Event(None, 'Dipakai', event['start'], event['end']))
         # now we append all of those information here
         listRoom.append(Room(roomID, name, email, events))
 
