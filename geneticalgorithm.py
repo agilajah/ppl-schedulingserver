@@ -235,6 +235,7 @@ def saveResult():
     # upload ke firebase
     dataFirebase.child('result').remove(tokenFirebase)
     dataFirebase.child('result').set(listResult, tokenFirebase)
+    del listResult[:]
 
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
