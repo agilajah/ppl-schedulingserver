@@ -245,8 +245,6 @@ def saveResult():
     global listStudent
     listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
     listResult = []
-    print listResult
-    print 'asjdhfgbasdhcjaskhfgb'
     for student in listStudent:
         idxDomain = student.sidang.idxDomain
         domain = student.sidang.domains[idxDomain]
@@ -263,11 +261,8 @@ def saveResult():
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
     # upload ke firebase
-    dataFirebase.child('result').set('hehe', tokenFirebase)
+    dataFirebase.child('result').remove(tokenFirebase)
     dataFirebase.child('result').set(listResult, tokenFirebase)
-    print listResult
-    print 'asjdhfgbasdhcjaskhfgb'
-    print listResult
 
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
@@ -289,6 +284,7 @@ def execGA():
 
 def studentParser(unparsedStudents):
     global listStudent
+    listStudent = []
     for unparsedStudent in unparsedStudents:
         studentID = unparsedStudent['studentID']
         name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
@@ -301,6 +297,7 @@ def studentParser(unparsedStudents):
 
 def lecturerParser(unparsedLecturers):
     global listLecturer
+    listLecturer = []
     for unparsedLecturer in unparsedLecturers:
         lecturerID = unparsedLecturer['lecturerID']
         name = unparsedLecturer['name']['first'] + ' ' + unparsedLecturer['name']['last']
@@ -323,6 +320,7 @@ def lecturerParser(unparsedLecturers):
 
 def roomParser(unparsedRooms):
     global listRoom
+    listRoom = []
     for unparsedRoom in unparsedRooms:
         roomID = unparsedRoom['roomID']
         name = unparsedRoom['name']
