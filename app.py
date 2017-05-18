@@ -366,7 +366,7 @@ def initFirebase():
     tokenFirebase = user['idToken']
     dataFirebase = firebase.database()
 
-def initData(tempUnparsedData):
+def initData():
     try: # ambil data dari firebase
         initFirebase()
         unparsedData = dataFirebase.get().val()['raw']
