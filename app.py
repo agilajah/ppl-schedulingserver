@@ -245,6 +245,8 @@ def saveResult():
     global listStudent
     listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
     listResult = []
+    print listResult
+    print 'asjdhfgbasdhcjaskhfgb'
     for student in listStudent:
         idxDomain = student.sidang.idxDomain
         domain = student.sidang.domains[idxDomain]
@@ -263,7 +265,9 @@ def saveResult():
     # upload ke firebase
     dataFirebase.child('result').set('hehe', tokenFirebase)
     dataFirebase.child('result').set(listResult, tokenFirebase)
-    del listResult[:]
+    print listResult
+    print 'asjdhfgbasdhcjaskhfgb'
+    print listResult
 
 def execGA():
 # inisialisasi sebelum manjalankan genetic algorithm
