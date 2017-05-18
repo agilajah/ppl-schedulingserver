@@ -244,7 +244,7 @@ def saveResult():
 # mencetak usulan jadwal sidang
     global listStudent
     listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
-    listResult = []
+    listResult = del[:]
     for student in listStudent:
         idxDomain = student.sidang.idxDomain
         domain = student.sidang.domains[idxDomain]
