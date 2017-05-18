@@ -359,7 +359,7 @@ def connectFirebase():
 
 def parseDatabase():
     try: # parse data
-        unparsedData = dbFirebase.child('raw').get()
+        unparsedData = dbFirebase.child('raw').get().val()
         periodParser(unparsedData['period'])
         roomParser(unparsedData['listRoom'])
         lecturerParser(unparsedData['listLecturer'])
