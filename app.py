@@ -261,7 +261,7 @@ def saveResult():
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
     # upload ke firebase
-    dataFirebase.child('result').remove(tokenFirebase)
+    dataFirebase.child('result').set('hehe', tokenFirebase)
     dataFirebase.child('result').set(listResult, tokenFirebase)
     del listResult[:]
 
