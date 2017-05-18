@@ -233,6 +233,7 @@ def saveResult():
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
     # upload ke firebase
+    dataFirebase.child('result').set('', tokenFirebase)
     dataFirebase.child('result').set(listResult, tokenFirebase)
 
 def execGA():
