@@ -332,7 +332,7 @@ def initData():
 
 ######################################## VARIABLE ########################################
 
-sidangPeriod = Event(None, 'Masa Sidang', '2017-07-03 07:00:00', '2017-07-03 13:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
+sidangPeriod = Event(None, 'Masa Sidang', '2017-07-03 07:00:00', '2017-07-07 18:00:00') # ini hardcode, dan harus dimulai jam 07:00:00
 hourToSecond = 3600 # konstanta
 dayToSecond = 86400 # konstanta
 weekToSecond = 604800 # konstanta
