@@ -1,7 +1,7 @@
 ######################################## MODULE ########################################
 
 from __future__ import division
-from apiclient import discovery
+from googleapiclient import discovery
 from flask import Flask
 from flask_restful import Api, Resource
 from oauth2client import client, tools
