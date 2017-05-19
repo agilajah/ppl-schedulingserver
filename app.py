@@ -3,10 +3,11 @@
 from __future__ import division
 from googleapiclient import discovery
 from flask import Flask
-from flask_restful import Api, Resource
+from flask_restful import Api, Resource, reqparse
 from oauth2client import client, tools
 from oauth2client.file import Storage
 from random import randint
+import argparse
 import datetime
 import httplib2
 import json
@@ -30,6 +31,17 @@ class Scheduler(Resource):
             result = runGA()
             saveResult()
             return result
+        except Exception as e:
+            return str(e)
+    def post(self):
+        return self.get()
+
+class Login(Resource):
+    def get(self):
+        try:
+            connectFirebase()
+            parseDatabase()
+            connectCalendar(getCredential(Resource.email))
         except Exception as e:
             return str(e)
     def post(self):
@@ -90,7 +102,8 @@ class Student():
         self.topic = topic
         self.pembimbingID = pembimbingID
         self.pengujiID = pengujiID
-        self.sidang = Sidang(studentID, pembimbingID + pengujiID)
+    def initSidang(self):
+        self.sidang = Sidang(self.studentID, self.pembimbingID + self.pengujiID)
 
 class Sidang():
 # class Sidang sebagai variable dalam genetic algorithm
@@ -241,12 +254,16 @@ def geneticAlgorithm(maxGeneration):
 def runGA():
 # inisialisasi sebelum manjalankan genetic algorithm
     global listGen
+    # atur domain
+    for student in listStudent:
+        student.initSidang()
+    # atur gen
+    for i in range(len(listGen)):
+        del listGen[i][:]
+        # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
+        for student in listStudent:
+            listGen[i].append(randint(0, len(student.sidang.domains) - 1))
     try:
-        for i in range(len(listGen)):
-            del listGen[i][:]
-            # untuk setiap mahasiswa pilih salah 1 domain (kemungkinan jadwal sidang) secara acak
-            for student in listStudent:
-                listGen[i].append(randint(0, len(student.sidang.domains) - 1))
         return geneticAlgorithm(20)
     except Exception as e:
         raise Exception('Failed to get solution: ' + str(e))
@@ -282,7 +299,7 @@ def periodParser(unparsedPeriod):
 
 def studentParser(unparsedStudents):
     global listStudent
-    listStudent = []
+    del listStudent[:]
     for unparsedStudent in unparsedStudents:
         studentID = unparsedStudent['studentID']
         name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
@@ -295,7 +312,7 @@ def studentParser(unparsedStudents):
 
 def lecturerParser(unparsedLecturers):
     global listLecturer
-    listLecturer = []
+    del listLecturer[:]
     for unparsedLecturer in unparsedLecturers:
         lecturerID = unparsedLecturer['lecturerID']
         name = unparsedLecturer['name']['first'] + ' ' + unparsedLecturer['name']['last']
@@ -309,7 +326,7 @@ def lecturerParser(unparsedLecturers):
 
 def roomParser(unparsedRooms):
     global listRoom
-    listRoom = []
+    del listRoom[:]
     for unparsedRoom in unparsedRooms:
         roomID = unparsedRoom['roomID']
         name = unparsedRoom['name']
@@ -328,7 +345,7 @@ def connectFirebase():
       "authDomain": "console.firebase.google.com/project/ppl-scheduling",
       "databaseURL": "https://ppl-scheduling.firebaseio.com",
       "storageBucket": "ppl-scheduling.appspot.com",
-      "serviceAccount": "credentials/credential_firebase.json"
+      "serviceAccount": "credentials/firebase.json"
     }
     email = '13514052@std.stei.itb.ac.id'
     password = 'PPL-K2E'
@@ -349,6 +366,26 @@ def parseDatabase():
     except Exception as e:
         raise Exception('Failed to parse data from Firebase: ' + str(e))
 
+def getCredential(email):
+    try:
+        path = os.path.join(TOKENPATH, email + '.json')
+        store = Storage(path)
+        credential = store.get()
+        if ((credential is None) or (credential.invalid)):
+            scope = 'https://www.googleapis.com/auth/calendar'
+            flow = client.flow_from_clientsecrets(TOKENCALENDARPATH, scope)
+            flow.user_agent = 'Penjadwalan Seminar/Sidang'
+            flag = argparse.ArgumentParser(parents = [tools.argparser]).parse_args()
+            credential = tools.run_flow(flow, store, flag)
+        return credential
+    except Exception as e:
+        raise Exception('Failed to get user\'s token: ' + str(e))
+
+def connectCalendar(credential):
+    http = credential.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http = http)
+    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+
 ######################################## VARIABLE ########################################
 
 flask = Flask(__name__)
@@ -365,14 +402,35 @@ listStudent = []
 listLecturer = []
 listRoom = []
 TOKENPATH = os.path.join(os.getcwd(), 'credentials')
-TOKENCALENDARPATH = os.path.join(TOKENPATH, 'credential_developer.json')
+TOKENCALENDARPATH = os.path.join(TOKENPATH, 'calendar.json')
 
 ######################################## MAIN ########################################
 
 api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
+api.add_resource(Login, '/login')
+parser = reqparse.RequestParser()
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port %d" % port)
     flask.run(debug=False, port=port, host='0.0.0.0')
+
+# testing Scheduler
+# try:
+#     connectFirebase()
+#     parseDatabase()
+#     result = runGA()
+#     saveResult()
+#     print result
+# except Exception as e:
+#     print str(e)
+
+# testing Login
+# try:
+#     connectFirebase()
+#     parseDatabase()
+#     connectCalendar(getCredential('mrnaufal17@gmail.com'))
+#     print 'haha'
+# except Exception as e:
+#     print str(e)
