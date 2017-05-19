@@ -44,12 +44,13 @@ class Scheduler(Resource):
 class Login(Resource):
     def get(self):
         try:
+            email = parser.parse_args()
             print 'Connecting Firebase...'
             connectFirebase()
             print 'Parsing data...'
             parseDatabase()
-            print 'Getting credential...'
-            credential = getCredential(parser.parse_args())
+            print 'Getting credential for ' + parser.parse_args() + '...'
+            credential = getCredential(email)
             print 'Connecting Google Calendar API...'
             connectCalendar(credential)
             print 'Done.'
