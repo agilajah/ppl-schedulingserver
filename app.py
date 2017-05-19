@@ -42,23 +42,23 @@ class Scheduler(Resource):
         return self.get()
 
 class Login(Resource):
-    def get(self):
+    def post(self):
         try:
-            email = parser.parse_args()
+            print 'Converting JSON file...'
+            jsonRuby = json.loads(parser.parse_args())
+            saveCredential(jsonRuby)
             print 'Connecting Firebase...'
             connectFirebase()
             print 'Parsing data...'
             parseDatabase()
-            print 'Getting credential for ' + parser.parse_args() + '...'
-            credential = getCredential(email)
-            print 'Connecting Google Calendar API...'
+            print 'Getting saved credential...'
+            credential = getCredential(jsonRuby['email'])
+            print 'Connecting to Google Calendar...'
             connectCalendar(credential)
             print 'Done.'
             return 'OK'
         except Exception as e:
             return str(e)
-    def post(self):
-        return self.get()
 
 ######################################## STRUKDAT ########################################
 
@@ -379,20 +379,48 @@ def parseDatabase():
     except Exception as e:
         raise Exception('Failed to parse data from Firebase: ' + str(e))
 
+def saveCredential(jsonRuby):
+    # ubah json dengan format ruby menjadi sesuai dengan format python
+    timeLong = int(jsonRuby['expiration_time_millis']) / 1000
+    timeStr = datetime.datetime.fromtimestamp(timeLong).strftime("%Y-%m-%dT%H:%M:%SZ")
+    jsonPython = {
+        "_module":"oauth2client.client",
+        "scopes":[
+          "https://www.googleapis.com/auth/calendar"
+        ],
+        "token_expiry":timeStr,
+        "id_token":None,
+        "user_agent":"Penjadwalan Seminar/Sidang",
+        "access_token":jsonRuby['access_token'],
+        "token_uri":"https://accounts.google.com/o/oauth2/token",
+        "invalid":False,
+        "token_response":{
+            "access_token":jsonRuby['access_token'],
+            "token_type":"Bearer",
+            "expires_in":3600,
+            "refresh_token":jsonRuby['refresh_token']
+        },
+        "client_id":"1031302495796-ij3m49g7g0p5p3523c9vltui4d1csafa.apps.googleusercontent.com",
+        "token_info_uri":"https://www.googleapis.com/oauth2/v3/tokeninfo",
+        "client_secret":"X5ejPZ623UUwnFrYyJDqrUFV",
+        "revoke_uri":"https://accounts.google.com/o/oauth2/revoke",
+          "_class":"OAuth2Credentials",
+        "refresh_token":jsonRuby['refresh_token'],
+        "id_token_jwt":None
+    }
+    # dump ke file
+    email = jsonRuby['email']
+    filename = os.path.join(TOKENPATH, email + '.json')
+    with open(filename, 'w') as outfile:
+        json.dump(jsonPython, outfile)
+
 def getCredential(email):
-    try:
-        path = os.path.join(TOKENPATH, email + '.json')
-        store = Storage(path)
-        credential = store.get()
-        if ((credential is None) or (credential.invalid)):
-            scope = 'https://www.googleapis.com/auth/calendar'
-            flow = client.flow_from_clientsecrets(TOKENCALENDARPATH, scope)
-            flow.user_agent = 'Penjadwalan Seminar/Sidang'
-            flag = argparse.ArgumentParser(parents = [tools.argparser]).parse_args()
-            credential = tools.run_flow(flow, store, flag)
-        return credential
-    except Exception as e:
-        raise Exception('Failed to get user\'s token: ' + str(e))
+    path = os.path.join(TOKENPATH, email + '.json')
+    store = Storage(path)
+    credential = store.get()
+    if ((credential is None) or (credential.invalid)):
+        raise Exception('Failed to get user\'s token: ' + email)
+    return credential
 
 def connectCalendar(credential):
     http = credential.authorize(httplib2.Http())
@@ -430,6 +458,8 @@ if __name__ == "__main__":
     print("Starting app on port %d" % port)
     flask.run(debug=False, port=port, host='0.0.0.0')
 
+######################################## TEST ########################################
+
 # testing Scheduler
 # try:
 #     connectFirebase()
@@ -441,10 +471,28 @@ if __name__ == "__main__":
 #     print str(e)
 
 # testing Login
+# ikhwan = json.dumps({
+#     "email":"ikhwan.m1996@gmail.com",
+#     "client_id":"637504288783-0868kkjoilbol4l8o8bum9s9fkjji38t.apps.googleusercontent.com",
+#     "access_token":"ya29.GltPBGyBm5f0u4U524qowqjsVjA-MiYTU3Xh7M-WDPW1odiq80sPaR6l084PcGjJckyX2kfJQqgDUgbTtMSFAPC-t5YF65n1HNkp9xQfverL4xzTeRVNC9ITl1Y2",
+#     "refresh_token":"1/Y1mQ51qnJGZSe3rOk2BVZQBY_b_Q07DLWBuIZEC9egQ",
+#     "scope":[
+#         "https://www.googleapis.com/auth/calendar"
+#     ],
+#     "expiration_time_millis":1495212704000
+# })
 # try:
+#     print 'Converting JSON file...'
+#     jsonRuby = json.loads(ikhwan)
+#     saveCredential(jsonRuby)
+#     print 'Connecting Firebase...'
 #     connectFirebase()
+#     print 'Parsing data...'
 #     parseDatabase()
-#     connectCalendar(getCredential('mrnaufal17@gmail.com'))
-#     print 'haha'
+#     print 'Getting saved credential...'
+#     credential = getCredential(jsonRuby['email'])
+#     print 'Connecting to Google Calendar...'
+#     connectCalendar(credential)
+#     print 'Done.'
 # except Exception as e:
 #     print str(e)
