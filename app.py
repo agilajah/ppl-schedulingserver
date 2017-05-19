@@ -41,7 +41,7 @@ class Login(Resource):
         try:
             connectFirebase()
             parseDatabase()
-            connectCalendar(getCredential(Resource.email))
+            connectCalendar(getCredential(parser.parse_args()))
         except Exception as e:
             return str(e)
     def post(self):
@@ -410,6 +410,7 @@ api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
 api.add_resource(Login, '/login')
 parser = reqparse.RequestParser()
+parser.add_argument('email', type = str, required = True, help='Please submit a valid email.', location = 'form')
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
