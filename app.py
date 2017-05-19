@@ -26,10 +26,15 @@ class Home(Resource):
 class Scheduler(Resource):
     def get(self):
         try:
+            print 'Connecting Firebase...'
             connectFirebase()
+            print 'Parsing data...'
             parseDatabase()
+            print 'Running algorithm...'
             result = runGA()
+            print 'Saving to Firebase...'
             saveResult()
+            print 'Done.'
             return result
         except Exception as e:
             return str(e)
@@ -39,9 +44,16 @@ class Scheduler(Resource):
 class Login(Resource):
     def get(self):
         try:
+            print 'Connecting Firebase...'
             connectFirebase()
+            print 'Parsing data...'
             parseDatabase()
-            connectCalendar(getCredential(parser.parse_args()))
+            print 'Getting credential...'
+            credential = getCredential(parser.parse_args())
+            print 'Connecting Google Calendar API...'
+            connectCalendar(credential)
+            print 'Done.'
+            return 'OK'
         except Exception as e:
             return str(e)
     def post(self):
