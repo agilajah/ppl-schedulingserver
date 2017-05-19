@@ -1,9 +1,14 @@
-# LIBRARY
+######################################## MODULE ########################################
+
 from __future__ import division
+from apiclient import discovery
 from flask import Flask
 from flask_restful import Api, Resource
+from oauth2client import client, tools
+from oauth2client.file import Storage
 from random import randint
 import datetime
+import httplib2
 import json
 import os
 import pyrebase
@@ -30,7 +35,7 @@ class Scheduler(Resource):
     def post(self):
         return self.get()
 
-######################################## STRUKTUR DATA ########################################
+######################################## STRUKDAT ########################################
 
 class Event():
 # kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
@@ -56,14 +61,14 @@ class Room():
         # generate jam tutup dan jam libur ruangan di masa sidang
         i = sidangPeriod.startLong
         while (i < sidangPeriod.endLong):
-            day = (i % weekToSecond) / dayToSecond
+            day = (i % WEEKTOSECOND) / DAYTOSECOND
             if (day >= 2 and day < 4): # hari sabtu atau minggu
                 # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
-                self.events.append(Event(None, 'Libur', longToDate(i), longToDate(i + dayToSecond)))
+                self.events.append(Event(None, 'Libur', longToDate(i), longToDate(i + DAYTOSECOND)))
             else: # hari senin sampe jumat
                 # ruangan tutup dari jam 6 sore sampe jam 7 besoknya
-                self.events.append(Event(None, 'Tutup', longToDate(i + (hourToSecond * 11)), longToDate(i + dayToSecond)))
-            i += dayToSecond
+                self.events.append(Event(None, 'Tutup', longToDate(i + (HOURTOSECOND * 11)), longToDate(i + DAYTOSECOND)))
+            i += DAYTOSECOND
 
 class Lecturer():
 # dosen
@@ -116,7 +121,7 @@ class Sidang():
     def searchDomains(self):
         i = sidangPeriod.startLong
         while (i < sidangPeriod.endLong):
-            candidateEvent = Event(None, 'Usulan sidang ' + str(self.studentID), longToDate(i), longToDate(i + hourToSecond))
+            candidateEvent = Event(None, 'Usulan sidang ' + str(self.studentID), longToDate(i), longToDate(i + HOURTOSECOND))
             # cek apakah dosen ada yang sedang sibuk
             isConflict = False
             for eventLecturer in self.events:
@@ -136,7 +141,7 @@ class Sidang():
                             break # tidak perlu cek lagi event selanjutnya, pasti gak bentrok
                     if (not isConflict): # ruangan kosong
                         self.domains.append(Domain(room.roomID, candidateEvent))
-            i += fortyMinutesToSecond # cek jadwal 1 sesi (40 menit) berikutnya
+            i += FORTYMINUTESTOSECOND # cek jadwal 1 sesi (40 menit) berikutnya
 
 class Domain():
 # class Domain sebagai domain dalam genetic algorithm
@@ -323,7 +328,7 @@ def connectFirebase():
       "authDomain": "console.firebase.google.com/project/ppl-scheduling",
       "databaseURL": "https://ppl-scheduling.firebaseio.com",
       "storageBucket": "ppl-scheduling.appspot.com",
-      "serviceAccount": "serviceAccountKey.json"
+      "serviceAccount": "credentials/credential_firebase.json"
     }
     email = '13514052@std.stei.itb.ac.id'
     password = 'PPL-K2E'
@@ -346,21 +351,23 @@ def parseDatabase():
 
 ######################################## VARIABLE ########################################
 
+flask = Flask(__name__)
+api = Api(flask)
 dbFirebase = None
 tokenFirebase = ''
 sidangPeriod = None
-fortyMinutesToSecond = 2400 # konstanta
-hourToSecond = 3600 # konstanta
-dayToSecond = 86400 # konstanta
-weekToSecond = 604800 # konstanta
+FORTYMINUTESTOSECOND = 2400
+HOURTOSECOND = 3600
+DAYTOSECOND = 86400
+WEEKTOSECOND = 604800
 listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list of idxDomain (elemennya sebanyak listStudent)
 listStudent = []
 listLecturer = []
 listRoom = []
-flask = Flask(__name__)
-api = Api(flask)
+TOKENPATH = os.path.join(os.getcwd(), 'credentials')
+TOKENCALENDARPATH = os.path.join(TOKENPATH, 'credential_developer.json')
 
-######################################## PROGRAM UTAMA ########################################
+######################################## MAIN ########################################
 
 api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
