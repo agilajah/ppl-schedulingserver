@@ -54,9 +54,9 @@ class Login(Resource):
             print 'Getting saved credential...'
             credential = getCredential(jsonRuby['email'])
             print 'Connecting to Google Calendar...'
-            connectCalendar(credential)
+            result = connectCalendar(credential)
             print 'Done.'
-            return 'OK'
+            return result
         except Exception as e:
             return str(e)
 
@@ -181,9 +181,12 @@ def dateToLong(date):
 # input string tanggal sesuai format google calendar, output long
     return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
 
-def longToDate(date):
-# input long, output string tanggal sesuai format google calendar
-    return datetime.datetime.fromtimestamp(date).strftime("%Y-%m-%d %H:%M:%S")
+def longToDate(seconds, iso = False):
+# input long, output string tanggal sesuai format google calendar / ISO
+    if (iso):
+        return datetime.datetime.fromtimestamp(seconds).strftime("%Y-%m-%dT%H:%M:%SZ")
+    else:
+        return datetime.datetime.fromtimestamp(seconds).strftime("%Y-%m-%d %H:%M:%S")
 
 def isEventConflict(candidateEvent, event):
 # cek apakah event 1 (candidateEvent) dengan event 2 (event) bentrok
@@ -380,19 +383,20 @@ def parseDatabase():
         raise Exception('Failed to parse data from Firebase: ' + str(e))
 
 def saveCredential(jsonRuby):
+    # load token untuk akses google calendar
+    with open('credentials/calendar.json') as inFile:
+        tokenCalendar = json.load(inFile)['installed']
     # ubah json dengan format ruby menjadi sesuai dengan format python
-    timeLong = int(jsonRuby['expiration_time_millis']) / 1000
-    timeStr = datetime.datetime.fromtimestamp(timeLong).strftime("%Y-%m-%dT%H:%M:%SZ")
     jsonPython = {
         "_module":"oauth2client.client",
         "scopes":[
           "https://www.googleapis.com/auth/calendar"
         ],
-        "token_expiry":timeStr,
+        "token_expiry":longToDate(int(jsonRuby['expiration_time_millis']) / 1000, True),
         "id_token":None,
         "user_agent":"Penjadwalan Seminar/Sidang",
         "access_token":jsonRuby['access_token'],
-        "token_uri":"https://accounts.google.com/o/oauth2/token",
+        "token_uri":tokenCalendar['token_uri'],
         "invalid":False,
         "token_response":{
             "access_token":jsonRuby['access_token'],
@@ -400,11 +404,11 @@ def saveCredential(jsonRuby):
             "expires_in":3600,
             "refresh_token":jsonRuby['refresh_token']
         },
-        "client_id":"1031302495796-ij3m49g7g0p5p3523c9vltui4d1csafa.apps.googleusercontent.com",
+        "client_id":tokenCalendar['client_id'],
         "token_info_uri":"https://www.googleapis.com/oauth2/v3/tokeninfo",
-        "client_secret":"X5ejPZ623UUwnFrYyJDqrUFV",
+        "client_secret":tokenCalendar['client_secret'],
         "revoke_uri":"https://accounts.google.com/o/oauth2/revoke",
-          "_class":"OAuth2Credentials",
+        "_class":"OAuth2Credentials",
         "refresh_token":jsonRuby['refresh_token'],
         "id_token_jwt":None
     }
@@ -423,9 +427,19 @@ def getCredential(email):
     return credential
 
 def connectCalendar(credential):
+    timeMin = longToDate(sidangPeriod.startLong, True)
+    timeMax = longToDate(sidangPeriod.endLong, True)
+    # dapatkan kelandar
     http = credential.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http = http)
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    listCal = service.calendarList().list().execute()['items']
+    listEvent = []
+    for item in listCal:
+        # dapatkan semua event di tiap kalendar pada rentang waktu sidangPeriod
+        events = service.events().list(calendarId=item['id'], timeMin=timeMin, timeMax=timeMax).execute()['items']
+        for event in events:
+            listEvent.append(event)
+    return json.dumps(listEvent)
 
 ######################################## VARIABLE ########################################
 
@@ -443,7 +457,6 @@ listStudent = []
 listLecturer = []
 listRoom = []
 TOKENPATH = os.path.join(os.getcwd(), 'credentials')
-TOKENCALENDARPATH = os.path.join(TOKENPATH, 'calendar.json')
 
 ######################################## MAIN ########################################
 
@@ -451,7 +464,7 @@ api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
 api.add_resource(Login, '/login')
 parser = reqparse.RequestParser()
-parser.add_argument('email', type = str, required = True, help='Please submit a valid email.', location = 'form')
+parser.add_argument('jsonRuby', type = str, required = True, help='Please submit a valid json.', location = 'form')
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
@@ -496,3 +509,14 @@ if __name__ == "__main__":
 #     print 'Done.'
 # except Exception as e:
 #     print str(e)
+
+# testing dapetin calendar
+# print 'Connecting Firebase...'
+# connectFirebase()
+# print 'Parsing data...'
+# parseDatabase()
+# print 'Getting saved credential...'
+# credential = getCredential('13514052@std.stei.itb.ac.id')
+# print 'Connecting to Google Calendar...'
+# print connectCalendar(credential)
+# print 'Done.'
