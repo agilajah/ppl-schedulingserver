@@ -19,7 +19,7 @@ import time
 
 class Home(Resource):
     def get(self):
-        return 'OK'
+        return 'Penjadwalan Seminar/Sidang'
     def post(self):
         return self.get()
 
@@ -46,15 +46,11 @@ class Login(Resource):
         try:
             print 'Converting JSON file...'
             jsonRuby = json.loads(parser.parse_args())
-            saveCredential(jsonRuby)
-            print 'Connecting Firebase...'
-            connectFirebase()
-            print 'Parsing data...'
-            parseDatabase()
-            print 'Getting saved credential...'
-            credential = getCredential(jsonRuby['email'])
+            jsonPath = saveCredential(jsonRuby)
             print 'Connecting to Google Calendar...'
-            result = connectCalendar(credential)
+            connectCalendar(jsonPath)
+            print 'Retrieving calendar list...'
+            result = getCalendarList()
             print 'Done.'
             return result
         except Exception as e:
@@ -356,16 +352,18 @@ def roomParser(unparsedRooms):
 def connectFirebase():
     global dbFirebase
     global tokenFirebase
+    # konfigurasi token yang digunakan untuk akses firebase
     config = {
       "apiKey": "AIzaSyBDd1cTxxIAjK-MsJu3d6bLJdAe_I3M0nk",
       "authDomain": "console.firebase.google.com/project/ppl-scheduling",
       "databaseURL": "https://ppl-scheduling.firebaseio.com",
       "storageBucket": "ppl-scheduling.appspot.com",
-      "serviceAccount": "credentials/firebase.json"
+      "serviceAccount": "admin/firebase.json"
     }
     email = '13514052@std.stei.itb.ac.id'
     password = 'PPL-K2E'
-    try: # ambil data dari firebase
+    # connect dan ambil data dari firebase
+    try:
         firebase = pyrebase.initialize_app(config)
         tokenFirebase = firebase.auth().sign_in_with_email_and_password(email, password)['idToken']
         dbFirebase = firebase.database()
@@ -373,7 +371,8 @@ def connectFirebase():
         raise Exception('Failed to connect to Firebase: ' + str(e))
 
 def parseDatabase():
-    try: # parse data
+    # parse data dari firebase, asumsi koneksi (dbFirebase) sudah establish
+    try:
         unparsedData = dbFirebase.child('raw').get().val()
         periodParser(unparsedData['period'])
         roomParser(unparsedData['listRoom'])
@@ -383,10 +382,10 @@ def parseDatabase():
         raise Exception('Failed to parse data from Firebase: ' + str(e))
 
 def saveCredential(jsonRuby):
-    # load token untuk akses google calendar
-    with open('credentials/calendar.json') as inFile:
+    # load token yang digunakan untuk akses google calendar
+    with open('admin/calendar.json') as inFile:
         tokenCalendar = json.load(inFile)['installed']
-    # ubah json dengan format ruby menjadi sesuai dengan format python
+    # ubah json dengan format ruby menjadi sesuai dengan python
     jsonPython = {
         "_module":"oauth2client.client",
         "scopes":[
@@ -413,33 +412,55 @@ def saveCredential(jsonRuby):
         "id_token_jwt":None
     }
     # dump ke file
-    email = jsonRuby['email']
-    filename = os.path.join(TOKENPATH, email + '.json')
-    with open(filename, 'w') as outfile:
-        json.dump(jsonPython, outfile)
+    filename = 'user/' + jsonRuby['email'] + '.json'
+    with open(filename, 'w') as outFile:
+        json.dump(jsonPython, outFile)
+    # return jsonPath nya sekalian untuk connectCalendar
+    return os.path.join(USERPATH, jsonRuby['email'] + '.json')
 
-def getCredential(email):
-    path = os.path.join(TOKENPATH, email + '.json')
-    store = Storage(path)
-    credential = store.get()
-    if ((credential is None) or (credential.invalid)):
-        raise Exception('Failed to get user\'s token: ' + email)
-    return credential
+def connectCalendar(jsonPath):
+    global calendarService
+    # hanya establish connection, tidak mengambil data apa-apa
+    try:
+        credential = Storage(jsonPath).get()
+        http = credential.authorize(httplib2.Http())
+        calendarService = discovery.build('calendar', 'v3', http = http)
+    except Exception as e:
+        raise Exception('Failed to connect to Google Calendar: ' + str(e))
 
-def connectCalendar(credential):
+def getCalendarList():
+    # dapatkan semua kalender, asumsi koneksi (calendarService) sudah establish
+    result =[]
+    calendarList = calendarService.calendarList().list().execute()['items']
+    for calendar in calendarList:
+        result.append({'id':calendar['id'], 'summary':calendar['summary']})
+    return result
+
+def getEvents(calendarList):
+    # asumsi koneksi (calendarService) sudah establish dan sesuai dengan calendarList nya
+    result = []
     timeMin = longToDate(sidangPeriod.startLong, True)
     timeMax = longToDate(sidangPeriod.endLong, True)
-    # dapatkan kelandar
-    http = credential.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http = http)
-    listCal = service.calendarList().list().execute()['items']
-    listEvent = []
-    for item in listCal:
+    for calendar in calendarList:
         # dapatkan semua event di tiap kalendar pada rentang waktu sidangPeriod
-        events = service.events().list(calendarId=item['id'], timeMin=timeMin, timeMax=timeMax).execute()['items']
+        events = calendarService.events().list(calendarId = calendar['id'], timeMin = timeMin, timeMax = timeMax).execute()['items']
         for event in events:
-            listEvent.append(event)
-    return json.dumps(listEvent)
+            result.append(event)
+    return result
+
+def getAllUserEvents():
+    result = []
+    for filename in os.listdir(USERPATH):
+        # load semua token milik dosen, dapatkan jadwalnya masing-masing
+        try:
+            jsonPath = os.path.join(USERPATH, filename)
+            connectCalendar(jsonPath)
+            events = getEvents(getCalendarList())
+            result.append({'filename':filename, 'events':events})
+        except Exception as e:
+            result.append({'filename':filename, 'events':[]})
+            continue
+    return result
 
 ######################################## VARIABLE ########################################
 
@@ -447,6 +468,7 @@ flask = Flask(__name__)
 api = Api(flask)
 dbFirebase = None
 tokenFirebase = ''
+calendarService = None
 sidangPeriod = None
 FORTYMINUTESTOSECOND = 2400
 HOURTOSECOND = 3600
@@ -456,7 +478,8 @@ listGen = [[], [], [], []] # 4 gen (4 populasi), masing-masing gen berupa list o
 listStudent = []
 listLecturer = []
 listRoom = []
-TOKENPATH = os.path.join(os.getcwd(), 'credentials')
+USERPATH = os.path.join(os.getcwd(), 'user')
+ADMINPATH = os.path.join(os.getcwd(), 'admin')
 
 ######################################## MAIN ########################################
 
@@ -473,17 +496,26 @@ if __name__ == "__main__":
 
 ######################################## TEST ########################################
 
-# testing Scheduler
+# testing scheduler
 # try:
+#     print 'Connecting Firebase...'
 #     connectFirebase()
+#     print 'Updating rooms schedule...'
+#     #
+#     print 'Updating users schedule...'
+#     #
+#     print 'Parsing data...'
 #     parseDatabase()
+#     print 'Running algorithm...'
 #     result = runGA()
+#     print 'Saving to Firebase...'
 #     saveResult()
+#     print 'Done.'
 #     print result
 # except Exception as e:
 #     print str(e)
 
-# testing Login
+# testing login
 # ikhwan = json.dumps({
 #     "email":"ikhwan.m1996@gmail.com",
 #     "client_id":"637504288783-0868kkjoilbol4l8o8bum9s9fkjji38t.apps.googleusercontent.com",
@@ -497,26 +529,27 @@ if __name__ == "__main__":
 # try:
 #     print 'Converting JSON file...'
 #     jsonRuby = json.loads(ikhwan)
-#     saveCredential(jsonRuby)
-#     print 'Connecting Firebase...'
-#     connectFirebase()
-#     print 'Parsing data...'
-#     parseDatabase()
-#     print 'Getting saved credential...'
-#     credential = getCredential(jsonRuby['email'])
+#     jsonPath = saveCredential(jsonRuby)
 #     print 'Connecting to Google Calendar...'
-#     connectCalendar(credential)
+#     connectCalendar(jsonPath)
+#     print 'Retrieving calendar list...'
+#     result = getCalendarList()
 #     print 'Done.'
+#     print json.dumps(result)
 # except Exception as e:
 #     print str(e)
 
-# testing dapetin calendar
+# testing retrieve event calendar
 # print 'Connecting Firebase...'
 # connectFirebase()
 # print 'Parsing data...'
 # parseDatabase()
-# print 'Getting saved credential...'
-# credential = getCredential('13514052@std.stei.itb.ac.id')
 # print 'Connecting to Google Calendar...'
-# print connectCalendar(credential)
+# jsonPath = os.path.join(USERPATH, 'mrnaufal17@gmail.com.json')
+# connectCalendar(jsonPath)
+# print 'Retrieving calendar list...'
+# calendarList = getCalendarList()
+# print 'Retrieving events...'
+# result = getEvents(calendarList)
 # print 'Done.'
+# print json.dumps(result)
