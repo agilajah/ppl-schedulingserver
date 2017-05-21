@@ -56,8 +56,10 @@ class Login(Resource):
 
 class TestHehe(Resource):
     def get(self):
+        global sidangPeriod
         sidangPeriod = Event(startDate = '2017-08-01', endDate = '2017-08-29')
         dosens = getAllUserEvents()
+        print 'Done.'
         for dosen in dosens:
             print dosen.lecturerID, dosen.name, dosen.email, dosen.topics
             for event in dosen.events:
@@ -315,65 +317,14 @@ def saveResult():
             "roomID" : room.roomID, "start" : domain.event.startDate, "end" : domain.event.endDate}
         listResult.append(result)
     # upload ke firebase
-    try:
-        dbFirebase.child('result').remove(tokenFirebase)
-        dbFirebase.child('result').set(listResult, tokenFirebase)
-    except Exception as e:
-        raise Exception('Failed to upload result to Firebase: ' + str(e))
-
-def periodParser(unparsedPeriod):
-    print 'Parsing sidang period data...'
-    global sidangPeriod
-    sidangPeriod = Event(name = 'Masa Sidang', startDate = unparsedPeriod['start'], endDate = unparsedPeriod['end'])
-
-def studentParser(unparsedStudents):
-    print 'Parsing student data...'
-    global listStudent
-    del listStudent[:]
-    for unparsedStudent in unparsedStudents:
-        studentID = unparsedStudent['studentID']
-        name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
-        email = unparsedStudent['email']
-        topic = unparsedStudent['topics']
-        pembimbingID = unparsedStudent['pembimbingID']
-        pengujiID = unparsedStudent['pengujiID']
-        # now we append all of those information here
-        listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
-
-def lecturerParser(unparsedLecturers):
-    print 'Parsing lecturer data...'
-    global listLecturer
-    del listLecturer[:]
-    for unparsedLecturer in unparsedLecturers:
-        lecturerID = unparsedLecturer['lecturerID']
-        name = unparsedLecturer['name']['first'] + ' ' + unparsedLecturer['name']['last']
-        email = unparsedLecturer['email']
-        topics = unparsedLecturer['topics']
-        events = []
-        for event in unparsedLecturer['events']:
-            events.append(Event(name = 'Busy', startDate = event['start'], endDate = event['end']))
-        # now we append all of those information here
-        listLecturer.append(Lecturer(lecturerID, name, email, topics, events))
-
-def roomParser(unparsedRooms):
-    print 'Parsing room data...'
-    global listRoom
-    del listRoom[:]
-    for unparsedRoom in unparsedRooms:
-        roomID = unparsedRoom['roomID']
-        name = unparsedRoom['name']
-        email = unparsedRoom['email']
-        events = []
-        for event in unparsedRoom['events']:
-            events.append(Event(name = 'Busy', startDate = event['start'], endDate = event['end']))
-        # now we append all of those information here
-        listRoom.append(Room(roomID, name, email, events))
+    setFirebase('result', listResult)
 
 def connectFirebase():
     print 'Connecting to Firebase...'
+    # establish koneksi dengan firebase
     global dbFirebase
     global tokenFirebase
-    # konfigurasi token yang digunakan untuk akses firebase
+    # konfigurasi token
     config = {
       "apiKey": "AIzaSyBDd1cTxxIAjK-MsJu3d6bLJdAe_I3M0nk",
       "authDomain": "console.firebase.google.com/project/ppl-scheduling",
@@ -391,16 +342,88 @@ def connectFirebase():
     except Exception as e:
         raise Exception('Failed to connect to Firebase: ' + str(e))
 
-def parseDatabase():
-    # parse data dari firebase, asumsi koneksi (dbFirebase) sudah establish
+def getFirebase(path = '/'):
+    # mengambil data pada path
     try:
-        unparsedData = dbFirebase.child('raw').get().val()
+        return dbFirebase.child(path).get().val()
+    except Exception as e:
+        raise Exception('Failed to read data on Firebase: ' + str(e))
+
+def setFirebase(path = '/', data = {}, replace = True):
+    # mengubah atau menghapus data pada path
+    try:
+        if (replace):
+            dbFirebase.child(path).remove(tokenFirebase)
+        dbFirebase.child(path).set(data, tokenFirebase)
+    except Exception as e:
+        raise Exception('Failed to update Firebase: ' + str(e))
+
+def parseDatabase():
+    print 'Parsing database on Firebase...'
+    # parse semua data di firebase
+    try:
+        unparsedData = getFirebase('raw')
         periodParser(unparsedData['period'])
         roomParser(unparsedData['listRoom'])
         lecturerParser(unparsedData['listLecturer'])
         studentParser(unparsedData['listStudent'])
     except Exception as e:
         raise Exception('Failed to parse data from Firebase: ' + str(e))
+
+def periodParser(unparsedPeriod):
+    print 'Parsing sidang period data...'
+    global sidangPeriod
+    sidangPeriod = Event(name = 'Masa Sidang', startDate = unparsedPeriod['start'], endDate = unparsedPeriod['end'])
+
+def roomParser(unparsedRooms):
+    print 'Parsing room data...'
+    global listRoom
+    del listRoom[:]
+    for unparsedRoom in unparsedRooms:
+        roomID = unparsedRoom['id']
+        name = unparsedRoom['name']
+        email = unparsedRoom['email']
+        events = []
+        if ('events' in unparsedRoom):
+            events = parseEventFirebase(unparsedRoom['events'])
+        # now we append all of those information here
+        listRoom.append(Room(roomID, name, email, events))
+
+def lecturerParser(unparsedLecturers):
+    print 'Parsing lecturer data...'
+    global listLecturer
+    del listLecturer[:]
+    for unparsedLecturer in unparsedLecturers:
+        lecturerID = unparsedLecturer['lecturerID']
+        name = unparsedLecturer['name']['first'] + ' ' + unparsedLecturer['name']['last']
+        email = unparsedLecturer['email']
+        topics = unparsedLecturer['topics']
+        events = []
+        if ('events' in unparsedLecturer):
+            events = parseEventFirebase(unparsedLecturer['events'])
+        # now we append all of those information here
+        listLecturer.append(Lecturer(lecturerID, name, email, topics, events))
+
+def studentParser(unparsedStudents):
+    print 'Parsing student data...'
+    global listStudent
+    del listStudent[:]
+    for unparsedStudent in unparsedStudents:
+        studentID = unparsedStudent['studentID']
+        name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
+        email = unparsedStudent['email']
+        topic = unparsedStudent['topics']
+        pembimbingID = unparsedStudent['pembimbingID']
+        pengujiID = unparsedStudent['pengujiID']
+        # now we append all of those information here
+        listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
+
+def parseEventFirebase(events):
+    # parse event-event ruangan / dosen yang ada pada firebase
+    resultEvents = []
+    for event in events:
+        resultEvents.append(Event(event['id'], event['name'], event['start'], event['end']))
+    return resultEvents
 
 def saveCredential(jsonRuby):
     print 'Converting token...'
@@ -443,8 +466,8 @@ def saveCredential(jsonRuby):
 
 def connectCalendar(jsonPath):
     print 'Connecting to Google Calendar...'
+    # establish koneksi dengan google calendar dengan token pada jsonPath
     global calendarService
-    # hanya establish connection, tidak mengambil data apa-apa
     try:
         credential = Storage(jsonPath).get()
         http = credential.authorize(httplib2.Http())
@@ -452,39 +475,52 @@ def connectCalendar(jsonPath):
     except Exception as e:
         raise Exception('Failed to connect to Google Calendar: ' + str(e))
 
-def getCalendarList():
+def getCalendarList(primary = True):
     print 'Retrieving calendar list...'
-    # dapatkan semua kalender, asumsi koneksi (calendarService) sudah establish
-    result =[]
+    # dapatkan semua kalender pada 1 akun
+    resultCalendarList =[]
     calendarList = calendarService.calendarList().list().execute()['items']
     for calendar in calendarList:
-        result.append({'id':calendar['id'], 'summary':calendar['summary']})
-    return result
+        if (not primary): # kalender primary tidak diambil
+            if ('primary' in calendar):
+                if (calendar['primary']):
+                    continue
+        # ambil data id dan summary
+        resultCalendarList.append({'id':calendar['id'], 'summary':calendar['summary']})
+    return resultCalendarList
 
-def getEvents(calendarList):
-    print 'Retrieving events...'
-    # asumsi koneksi (calendarService) sudah establish dan sesuai dengan calendarList nya
-    result = []
+def getEventsAll(calendarList = []):
+    print 'Retrieving all events...'
+    # dapatkan semua event pada semua kalender
+    resultEvents = []
+    for calendar in calendarList:
+        resultEvents += getEventsSingle(calendar['id'])
+    return resultEvents
+
+def getEventsSingle(calendarId):
+    print 'Retrieving events...', calendarId
+    # dapatkan semua event pada 1 kalender, yang berada di rentang periode sidang
+    resultEvents = []
     timeMin = longToDate(sidangPeriod.startLong) + '+07:00'
     timeMax = longToDate(sidangPeriod.endLong) + '+07:00'
-    for calendar in calendarList:
-        # dapatkan semua event di tiap kalendar pada rentang waktu sidangPeriod
-        events = calendarService.events().list(calendarId = calendar['id'], timeMin = timeMin, timeMax = timeMax, singleEvents = True).execute()['items']
-        for event in events:
-            eventID = event['id']
-            name = event['summary']
-            startDate = event['start']
-            if ('dateTime' in startDate):
-                startDate = startDate['dateTime']
-            elif ('date' in startDate):
-                startDate = startDate['date']
-            endDate = event['end']
-            if ('dateTime' in endDate):
-                endDate = endDate['dateTime']
-            elif ('date' in endDate):
-                endDate = endDate['date']
-            result.append(Event(eventID, name, startDate, endDate))
-    return result
+    events = calendarService.events().list(calendarId = calendarId, timeMin = timeMin, timeMax = timeMax, singleEvents = True).execute()['items']
+    for event in events:
+        # ambil data id, summary, start date, end date
+        eventID = event['id']
+        name = event['summary']
+        startDate = event['start']
+        if ('dateTime' in startDate):
+            startDate = startDate['dateTime']
+        elif ('date' in startDate):
+            startDate = startDate['date']
+        endDate = event['end']
+        if ('dateTime' in endDate):
+            endDate = endDate['dateTime']
+        elif ('date' in endDate):
+            endDate = endDate['date']
+        # buat objeknya
+        resultEvents.append(Event(eventID, name, startDate, endDate))
+    return resultEvents
 
 def getAllUserEvents():
     result = []
@@ -494,11 +530,37 @@ def getAllUserEvents():
             print 'Token:', filename
             jsonPath = os.path.join(USERPATH, filename)
             connectCalendar(jsonPath)
-            events = getEvents(getCalendarList())
-            result.append(Lecturer(events = events))
+            events = getEventsAll(getCalendarList())
+            email = filename.split('.json')[0]
+            name = email.split('@')[0]
+            result.append(Lecturer(name = name, email = email, events = events))
         except Exception as e:
+            print 'Error:', e
             continue
     return result
+
+def updateRoomFirebase():
+    print 'Updating room database...'
+    # sinkronkan jadwal sibuk semua ruangan dari google calendar ke firebase
+    listRoom = []
+    filename = 'ruang.labtek5@gmail.com.json'
+    jsonPath = os.path.join(ADMINPATH, filename)
+    connectCalendar(jsonPath)
+    calendarList = getCalendarList(False) # primary calendar tidak diikutsertakan
+    for calendar in calendarList:
+        roomID = calendar['id']
+        name = calendar['summary']
+        email = filename.split('.json')[0]
+        events = []
+        listEvent = getEventsSingle(roomID)
+        for event in listEvent:
+            eventID = event.eventID
+            eventName = event.name
+            start = event.startDate
+            end = event.endDate
+            events.append({'id':eventID, 'name':eventName, 'start':start, 'end':end})
+        listRoom.append({'id':roomID, 'name':name, 'email':email, 'events':events})
+    setFirebase('raw/listRoom', listRoom)
 
 ######################################## VARIABLE ########################################
 
@@ -519,18 +581,18 @@ ADMINPATH = os.path.join(os.getcwd(), 'admin')
 
 ######################################## MAIN ########################################
 
-flask = Flask(__name__)
-api = Api(flask)
-api.add_resource(Home, '/', endpoint = "home")
-api.add_resource(Scheduler, '/schedule')
-api.add_resource(Login, '/login')
-api.add_resource(TestHehe, '/testhehe')
-parser = reqparse.RequestParser()
-parser.add_argument('token', type = str, required = False, help='Please submit a valid json.', location = 'json')
+# flask = Flask(__name__)
+# api = Api(flask)
+# api.add_resource(Home, '/', endpoint = "home")
+# api.add_resource(Scheduler, '/schedule')
+# api.add_resource(Login, '/login')
+# api.add_resource(TestHehe, '/testhehe')
+# parser = reqparse.RequestParser()
+# parser.add_argument('token', type = str, required = True, help='Please submit a valid json.', location = 'json')
 
-if __name__ == "__main__":
-    port = int(os.getenv('PORT', 5000))
-    flask.run(debug=False, port=port, host='0.0.0.0')
+# if __name__ == "__main__":
+#     port = int(os.getenv('PORT', 5000))
+#     flask.run(debug=False, port=port, host='0.0.0.0')
 
 ######################################## TEST ########################################
 
@@ -576,7 +638,7 @@ if __name__ == "__main__":
 # jsonPath = os.path.join(USERPATH, 'mrnaufal17@gmail.com.json')
 # connectCalendar(jsonPath)
 # calendarList = getCalendarList()
-# result = getEvents(calendarList)
+# result = getEventsAll(calendarList)
 # print 'Done.'
 # for hehe in result:
 #     print hehe.name, hehe.startDate, hehe.endDate
