@@ -581,18 +581,18 @@ ADMINPATH = os.path.join(os.getcwd(), 'admin')
 
 ######################################## MAIN ########################################
 
-# flask = Flask(__name__)
-# api = Api(flask)
-# api.add_resource(Home, '/', endpoint = "home")
-# api.add_resource(Scheduler, '/schedule')
-# api.add_resource(Login, '/login')
-# api.add_resource(TestHehe, '/testhehe')
-# parser = reqparse.RequestParser()
-# parser.add_argument('token', type = str, required = True, help='Please submit a valid json.', location = 'json')
+flask = Flask(__name__)
+api = Api(flask)
+api.add_resource(Home, '/', endpoint = "home")
+api.add_resource(Scheduler, '/schedule')
+api.add_resource(Login, '/login')
+api.add_resource(TestHehe, '/testhehe')
+parser = reqparse.RequestParser()
+parser.add_argument('token', type = str, required = True, help='Please submit a valid json.', location = 'json')
 
-# if __name__ == "__main__":
-#     port = int(os.getenv('PORT', 5000))
-#     flask.run(debug=False, port=port, host='0.0.0.0')
+if __name__ == "__main__":
+    port = int(os.getenv('PORT', 5000))
+    flask.run(debug=False, port=port, host='0.0.0.0')
 
 ######################################## TEST ########################################
 
