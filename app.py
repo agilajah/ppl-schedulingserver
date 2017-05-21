@@ -1,9 +1,10 @@
 ######################################## MODULE ########################################
 
 from __future__ import division
-from googleapiclient import discovery
+from dateutil.parser import parse
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
+from googleapiclient import discovery
 from oauth2client import client, tools
 from oauth2client.file import Storage
 from random import randint
@@ -26,13 +27,9 @@ class Home(Resource):
 class Scheduler(Resource):
     def get(self):
         try:
-            print 'Connecting Firebase...'
             connectFirebase()
-            print 'Parsing data...'
             parseDatabase()
-            print 'Running algorithm...'
             result = runGA()
-            print 'Saving to Firebase...'
             saveResult()
             print 'Done.'
             return result
@@ -44,12 +41,9 @@ class Scheduler(Resource):
 class Login(Resource):
     def post(self):
         try:
-            print 'Converting JSON file...'
             jsonRuby = json.loads(parser.parse_args())
             jsonPath = saveCredential(jsonRuby)
-            print 'Connecting to Google Calendar...'
             connectCalendar(jsonPath)
-            print 'Retrieving calendar list...'
             result = getCalendarList()
             print 'Done.'
             return result
@@ -60,7 +54,7 @@ class Login(Resource):
 
 class Event():
 # kegiatan yang menyebabkan slot waktu tidak bisa dipakai (busy)
-    def __init__(self, eventID = None, name = 'An event', startDate = None, endDate = None):
+    def __init__(self, eventID = '', name = 'An event', startDate = '', endDate = ''):
         self.eventID = eventID
         self.name = name
         self.startDate = startDate
@@ -71,7 +65,8 @@ class Event():
 
 class Room():
 # ruangan
-    def __init__(self, roomID = None, name = 'A room', email = 'a.room@gmail.com', events = []):
+    def __init__(self, roomID = '', name = 'A room', email = 'ruang.labtek5@gmail.com', events = []):
+        print 'Creating a room object:', name
         self.roomID = roomID
         self.name = name
         self.email = email
@@ -85,15 +80,19 @@ class Room():
             day = (i % WEEKTOSECOND) / DAYTOSECOND
             if (day >= 2 and day < 4): # hari sabtu atau minggu
                 # ruangan tutup dari jam 7 pagi sampe jam 7 pagi besoknya
-                self.events.append(Event(None, 'Libur', longToDate(i), longToDate(i + DAYTOSECOND)))
+                startDate = longToDate(i)
+                endDate = longToDate(i + DAYTOSECOND)
             else: # hari senin sampe jumat
                 # ruangan tutup dari jam 6 sore sampe jam 7 besoknya
-                self.events.append(Event(None, 'Tutup', longToDate(i + (HOURTOSECOND * 11)), longToDate(i + DAYTOSECOND)))
+                startDate = longToDate(i + (HOURTOSECOND * 11))
+                endDate = longToDate(i + DAYTOSECOND)
+            self.events.append(Event(name = 'Tutup', startDate = startDate, endDate = endDate)) # tanpa eventID
             i += DAYTOSECOND
 
 class Lecturer():
 # dosen
-    def __init__(self, lecturerID = None, name = 'Foolan', email = 'foolan@gmail.com', topics = [], events = []):
+    def __init__(self, lecturerID = '', name = 'Fulan', email = 'fulan@gmail.com', topics = [], events = []):
+        print 'Creating a lecturer object:', name
         self.lecturerID = lecturerID
         self.name = name
         self.email = email
@@ -104,7 +103,8 @@ class Lecturer():
 class Student():
 # mahasiswa
 # asumsi: mahasiswa selalu siap sedia, tidak punya jadwal sibuk
-    def __init__(self, studentID = None, name = 'Foolan', email = 'foolan@gmail.com', topic = None, pembimbingID = [], pengujiID =[]):
+    def __init__(self, studentID = '', name = 'Fulan', email = 'fulan@gmail.com', topic = '', pembimbingID = [], pengujiID =[]):
+        print 'Creating a student object:', name
         self.studentID = studentID
         self.name = name
         self.email = email
@@ -116,7 +116,8 @@ class Student():
 
 class Sidang():
 # class Sidang sebagai variable dalam genetic algorithm
-    def __init__(self, studentID = None, lecturersID = []):
+    def __init__(self, studentID = '', lecturersID = []):
+        print 'Creating a sidang object:', studentID
         self.studentID = studentID
         self.lecturersID = lecturersID
         self.events = []
@@ -143,7 +144,7 @@ class Sidang():
     def searchDomains(self):
         i = sidangPeriod.startLong
         while (i < sidangPeriod.endLong):
-            candidateEvent = Event(None, 'Usulan sidang ' + str(self.studentID), longToDate(i), longToDate(i + HOURTOSECOND))
+            candidateEvent = Event(name = 'Usulan sidang ' + str(self.studentID), startDate = longToDate(i), endDate = longToDate(i + HOURTOSECOND))
             # cek apakah dosen ada yang sedang sibuk
             isConflict = False
             for eventLecturer in self.events:
@@ -175,14 +176,11 @@ class Domain():
 
 def dateToLong(date):
 # input string tanggal sesuai format google calendar, output long
-    return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
+    return time.mktime(parse(date).timetuple())
 
-def longToDate(seconds, iso = False):
+def longToDate(seconds):
 # input long, output string tanggal sesuai format google calendar / ISO
-    if (iso):
-        return datetime.datetime.fromtimestamp(seconds).strftime("%Y-%m-%dT%H:%M:%SZ")
-    else:
-        return datetime.datetime.fromtimestamp(seconds).strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.datetime.fromtimestamp(seconds).isoformat()
 
 def isEventConflict(candidateEvent, event):
 # cek apakah event 1 (candidateEvent) dengan event 2 (event) bentrok
@@ -222,6 +220,7 @@ def geneticAlgorithm(maxGeneration):
     generation = 0
     while True:
         generation += 1
+        print 'Running algorithm:', generation
         # hitung fitness tiap gen
         del fitness[:]
         for i in range(len(listGen)):
@@ -282,6 +281,7 @@ def runGA():
 
 def saveResult():
 # mencetak usulan jadwal sidang
+    print 'Saving result to Firebase...'
     global listStudent
     listStudent.sort(key = lambda student : student.sidang.domains[student.sidang.idxDomain].event.startLong)
     listResult = []
@@ -306,10 +306,12 @@ def saveResult():
         raise Exception('Failed to upload result to Firebase: ' + str(e))
 
 def periodParser(unparsedPeriod):
+    print 'Parsing sidang period data...'
     global sidangPeriod
-    sidangPeriod = Event(None, 'Masa Sidang', unparsedPeriod['start'], unparsedPeriod['end'])
+    sidangPeriod = Event(name = 'Masa Sidang', startDate = unparsedPeriod['start'], endDate = unparsedPeriod['end'])
 
 def studentParser(unparsedStudents):
+    print 'Parsing student data...'
     global listStudent
     del listStudent[:]
     for unparsedStudent in unparsedStudents:
@@ -323,6 +325,7 @@ def studentParser(unparsedStudents):
         listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
 
 def lecturerParser(unparsedLecturers):
+    print 'Parsing lecturer data...'
     global listLecturer
     del listLecturer[:]
     for unparsedLecturer in unparsedLecturers:
@@ -332,11 +335,12 @@ def lecturerParser(unparsedLecturers):
         topics = unparsedLecturer['topics']
         events = []
         for event in unparsedLecturer['events']:
-            events.append(Event(None, 'Sibuk', event['start'], event['end']))
+            events.append(Event(name = 'Busy', startDate = event['start'], endDate = event['end']))
         # now we append all of those information here
         listLecturer.append(Lecturer(lecturerID, name, email, topics, events))
 
 def roomParser(unparsedRooms):
+    print 'Parsing room data...'
     global listRoom
     del listRoom[:]
     for unparsedRoom in unparsedRooms:
@@ -345,11 +349,12 @@ def roomParser(unparsedRooms):
         email = unparsedRoom['email']
         events = []
         for event in unparsedRoom['events']:
-            events.append(Event(None, 'Dipakai', event['start'], event['end']))
+            events.append(Event(name = 'Busy', startDate = event['start'], endDate = event['end']))
         # now we append all of those information here
         listRoom.append(Room(roomID, name, email, events))
 
 def connectFirebase():
+    print 'Connecting to Firebase...'
     global dbFirebase
     global tokenFirebase
     # konfigurasi token yang digunakan untuk akses firebase
@@ -382,6 +387,7 @@ def parseDatabase():
         raise Exception('Failed to parse data from Firebase: ' + str(e))
 
 def saveCredential(jsonRuby):
+    print 'Converting token...'
     # load token yang digunakan untuk akses google calendar
     with open('admin/calendar.json') as inFile:
         tokenCalendar = json.load(inFile)['installed']
@@ -391,7 +397,7 @@ def saveCredential(jsonRuby):
         "scopes":[
           "https://www.googleapis.com/auth/calendar"
         ],
-        "token_expiry":longToDate(int(jsonRuby['expiration_time_millis']) / 1000, True),
+        "token_expiry":longToDate(int(jsonRuby['expiration_time_millis']) / 1000),
         "id_token":None,
         "user_agent":"Penjadwalan Seminar/Sidang",
         "access_token":jsonRuby['access_token'],
@@ -412,6 +418,7 @@ def saveCredential(jsonRuby):
         "id_token_jwt":None
     }
     # dump ke file
+    print 'Saving converted token...'
     filename = 'user/' + jsonRuby['email'] + '.json'
     with open(filename, 'w') as outFile:
         json.dump(jsonPython, outFile)
@@ -419,6 +426,7 @@ def saveCredential(jsonRuby):
     return os.path.join(USERPATH, jsonRuby['email'] + '.json')
 
 def connectCalendar(jsonPath):
+    print 'Connecting to Google Calendar...'
     global calendarService
     # hanya establish connection, tidak mengambil data apa-apa
     try:
@@ -429,6 +437,7 @@ def connectCalendar(jsonPath):
         raise Exception('Failed to connect to Google Calendar: ' + str(e))
 
 def getCalendarList():
+    print 'Retrieving calendar list...'
     # dapatkan semua kalender, asumsi koneksi (calendarService) sudah establish
     result =[]
     calendarList = calendarService.calendarList().list().execute()['items']
@@ -437,15 +446,28 @@ def getCalendarList():
     return result
 
 def getEvents(calendarList):
+    print 'Retrieving events...'
     # asumsi koneksi (calendarService) sudah establish dan sesuai dengan calendarList nya
     result = []
-    timeMin = longToDate(sidangPeriod.startLong, True)
-    timeMax = longToDate(sidangPeriod.endLong, True)
+    timeMin = longToDate(sidangPeriod.startLong) + '+07:00'
+    timeMax = longToDate(sidangPeriod.endLong) + '+07:00'
     for calendar in calendarList:
         # dapatkan semua event di tiap kalendar pada rentang waktu sidangPeriod
-        events = calendarService.events().list(calendarId = calendar['id'], timeMin = timeMin, timeMax = timeMax).execute()['items']
+        events = calendarService.events().list(calendarId = calendar['id'], timeMin = timeMin, timeMax = timeMax, singleEvents = True).execute()['items']
         for event in events:
-            result.append(event)
+            eventID = event['id']
+            name = event['summary']
+            startDate = event['start']
+            if ('dateTime' in startDate):
+                startDate = startDate['dateTime']
+            elif ('date' in startDate):
+                startDate = startDate['date']
+            endDate = event['end']
+            if ('dateTime' in endDate):
+                endDate = endDate['dateTime']
+            elif ('date' in endDate):
+                endDate = endDate['date']
+            result.append(Event(eventID, name, startDate, endDate))
     return result
 
 def getAllUserEvents():
@@ -456,9 +478,9 @@ def getAllUserEvents():
             jsonPath = os.path.join(USERPATH, filename)
             connectCalendar(jsonPath)
             events = getEvents(getCalendarList())
-            result.append({'filename':filename, 'events':events})
+            result.append(Lecturer(events = events))
         except Exception as e:
-            result.append({'filename':filename, 'events':[]})
+            result.append(Lecturer())
             continue
     return result
 
@@ -483,32 +505,27 @@ ADMINPATH = os.path.join(os.getcwd(), 'admin')
 
 ######################################## MAIN ########################################
 
-api.add_resource(Home, '/', endpoint = "home")
-api.add_resource(Scheduler, '/schedule')
-api.add_resource(Login, '/login')
-parser = reqparse.RequestParser()
-parser.add_argument('jsonRuby', type = str, required = True, help='Please submit a valid json.', location = 'form')
+# api.add_resource(Home, '/', endpoint = "home")
+# api.add_resource(Scheduler, '/schedule')
+# api.add_resource(Login, '/login')
+# parser = reqparse.RequestParser()
+# parser.add_argument('jsonRuby', type = str, required = True, help='Please submit a valid json.', location = 'form')
 
-if __name__ == "__main__":
-    port = int(os.getenv('PORT', 5000))
-    print("Starting app on port %d" % port)
-    flask.run(debug=False, port=port, host='0.0.0.0')
+# if __name__ == "__main__":
+#     port = int(os.getenv('PORT', 5000))
+#     flask.run(debug=False, port=port, host='0.0.0.0')
 
 ######################################## TEST ########################################
 
-# testing scheduler
+# testing geneticAlgorithm
 # try:
-#     print 'Connecting Firebase...'
 #     connectFirebase()
 #     print 'Updating rooms schedule...'
 #     #
 #     print 'Updating users schedule...'
 #     #
-#     print 'Parsing data...'
 #     parseDatabase()
-#     print 'Running algorithm...'
 #     result = runGA()
-#     print 'Saving to Firebase...'
 #     saveResult()
 #     print 'Done.'
 #     print result
@@ -527,29 +544,33 @@ if __name__ == "__main__":
 #     "expiration_time_millis":1495212704000
 # })
 # try:
-#     print 'Converting JSON file...'
 #     jsonRuby = json.loads(ikhwan)
 #     jsonPath = saveCredential(jsonRuby)
-#     print 'Connecting to Google Calendar...'
 #     connectCalendar(jsonPath)
-#     print 'Retrieving calendar list...'
 #     result = getCalendarList()
 #     print 'Done.'
 #     print json.dumps(result)
 # except Exception as e:
 #     print str(e)
 
-# testing retrieve event calendar
-# print 'Connecting Firebase...'
+# testing getEvents
 # connectFirebase()
-# print 'Parsing data...'
 # parseDatabase()
-# print 'Connecting to Google Calendar...'
 # jsonPath = os.path.join(USERPATH, 'mrnaufal17@gmail.com.json')
 # connectCalendar(jsonPath)
-# print 'Retrieving calendar list...'
 # calendarList = getCalendarList()
-# print 'Retrieving events...'
 # result = getEvents(calendarList)
 # print 'Done.'
-# print json.dumps(result)
+# for hehe in result:
+#     print hehe.name, hehe.startDate, hehe.endDate
+
+# testing getAllUserEvents
+# sidangPeriod = Event(startDate = '2017-08-01', endDate = '2017-08-29')
+# dosens = getAllUserEvents()
+# for dosen in dosens:
+#     print dosen.lecturerID
+#     print dosen.name
+#     print dosen.email
+#     print dosen.topics
+#     for event in dosen.events:
+#         print event.name, event.startDate, event.endDate
