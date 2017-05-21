@@ -54,6 +54,18 @@ class Login(Resource):
         except Exception as e:
             return str(e)
 
+class TestHehe(Resource):
+    def get(self):
+        sidangPeriod = Event(startDate = '2017-08-01', endDate = '2017-08-29')
+        dosens = getAllUserEvents()
+        for dosen in dosens:
+            print dosen.lecturerID, dosen.name, dosen.email, dosen.topics
+            for event in dosen.events:
+                print event.name, event.startDate, event.endDate
+        return 'OK'
+    def post(self):
+        return self.get()
+
 ######################################## STRUKDAT ########################################
 
 class Event():
@@ -484,7 +496,6 @@ def getAllUserEvents():
             events = getEvents(getCalendarList())
             result.append(Lecturer(events = events))
         except Exception as e:
-            result.append(Lecturer())
             continue
     return result
 
@@ -512,6 +523,7 @@ api = Api(flask)
 api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
 api.add_resource(Login, '/login')
+api.add_resource(TestHehe, '/testhehe')
 parser = reqparse.RequestParser()
 parser.add_argument('token', type = str, required = False, help='Please submit a valid json.', location = 'json')
 
