@@ -30,6 +30,8 @@ class Scheduler(Resource):
         try:
             connectFirebase()
             parseDatabase()
+            updateAllRoomFirebase()
+            updateAllLecturerFirebase()
             result = runGA()
             saveResult()
             print 'Done.'
@@ -46,11 +48,10 @@ class Login(Resource):
         try:
             jsonRuby = parser.parse_args(strict = True)['token']
             jsonRuby = ast.literal_eval(jsonRuby)
-            jsonPath = saveCredential(jsonRuby)
-            connectCalendar(jsonPath)
-            result = getCalendarList()
-            print 'Done.'
-            return result
+            connectFirebase()
+            parseDatabase()
+            checkLogin(jsonRuby)
+            return 'OK'
         except Exception as e:
             return str(e)
 
@@ -470,8 +471,8 @@ def getEventsSingle(calendarId):
         resultEvents.append({'id':eventID, 'name':name, 'start':startDate, 'end':endDate})
     return resultEvents
 
-def updateRoomFirebase():
-    print 'Updating room database...'
+def updateAllRoomFirebase():
+    print 'Updating all room database...'
     # sinkronkan jadwal sibuk semua ruangan dari google calendar ke firebase
     listRoom = []
     filename = 'ruang.labtek5@gmail.com.json'
@@ -486,27 +487,60 @@ def updateRoomFirebase():
         listRoom.append({'id':roomID, 'name':name, 'email':email, 'events':events})
     setFirebase('raw/listRoom', listRoom)
 
-def updateLecturerFirebase():
-    print 'Updating lecturer database...'
+def updateAllLecturerFirebase():
+    print 'Updating all lecturer database...'
     # sinkronkan jadwal sibuk semua dosen dari google calendar ke firebase
-    resultLecturer  = []
-    for lecturer in listLecturer:
-        lecturerID = lecturer.lecturerID
-        name = lecturer.name
-        email = lecturer.email
-        topics = lecturer.topics
-        # create temporary file untuk token untuk koneksi google calendar
-        token = lecturer.token
+    for i in range(len(listLecturer)):
+        updateSingleLecturerFirebase(listLecturer[i], i)
+
+def updateSingleLecturerFirebase(lecturer, idx):
+    print 'Updating lecturer database:', lecturer.name
+    lecturerID = lecturer.lecturerID
+    name = lecturer.name
+    email = lecturer.email
+    topics = lecturer.topics
+    # create temporary file untuk token untuk koneksi google calendar
+    token = lecturer.token
+    filename = 'user/temporaryToken.json'
+    with open(filename, 'w') as outFile:
+        json.dump(token, outFile)
+    jsonPath = os.path.join(USERPATH, 'temporaryToken.json')
+    connectCalendar(jsonPath)
+    events = getEventsAll(getCalendarList())
+    resultLecturer = {'id':lecturerID, 'name':name, 'email':email, 'topics':topics, 'events':events, 'token':token}
+    setFirebase('raw/listLecturer/' + str(idx), resultLecturer)
+
+def checkLogin(jsonRuby):
+    print 'Checking if a new user...'
+    found = False
+    email = jsonRuby['email']
+    for i in range(len(listLecturer)):
+        # sudah pernah login sebelumnya, tinggal refresh token
+        if (email == listLecturer[i].email):
+            print 'Old user, updating token...'
+            listLecturer[i].token = convertToken(jsonRuby)
+            updateSingleLecturerFirebase(listLecturer[i], i)
+            found = True
+            break
+    if (not found):
+        print 'New user, saving data...'
+        # user baru, bikin objek baru
+        lecturerID = email
+        name = email.split('@')[0]
+        topics = ['Informatics']
+        token = convertToken(jsonRuby)
         filename = 'user/temporaryToken.json'
         with open(filename, 'w') as outFile:
             json.dump(token, outFile)
-        jsonPath = os.path.join(USERPATH, 'temporaryToken.json')
+        jsonPath = os.path.join(USERPATH, filename)
         connectCalendar(jsonPath)
-        events = getEventsAll(getCalendarList())
-        resultLecturer.append({'id':lecturerID, 'name':name, 'email':email, 'topics':topics, 'events':events, 'token':token})
-    setFirebase('raw/listLecturer', resultLecturer)
+        events = parseEventFirebase(getEventsAll(getCalendarList()))
+        lecturer = Lecturer(lecturerID, name, email, topics, events, token)
+        # append ke objek local dan simpan di firebase
+        updateSingleLecturerFirebase(lecturer, len(listLecturer))
+        listLecturer.append(lecturer)
 
-def saveCredential(jsonRuby):
+def convertToken(jsonRuby):
     print 'Converting token...'
     # load token yang digunakan untuk akses google calendar
     with open('admin/calendar.json') as inFile:
@@ -537,13 +571,7 @@ def saveCredential(jsonRuby):
         "refresh_token":jsonRuby['refresh_token'],
         "id_token_jwt":None
     }
-    # dump ke file
-    print 'Saving converted token...'
-    filename = 'user/' + jsonRuby['email'] + '.json'
-    with open(filename, 'w') as outFile:
-        json.dump(jsonPython, outFile)
-    # return jsonPath nya sekalian untuk connectCalendar
-    return os.path.join(USERPATH, jsonRuby['email'] + '.json')
+    return jsonPython
 
 ######################################## VARIABLE ########################################
 
@@ -568,9 +596,9 @@ flask = Flask(__name__)
 api = Api(flask)
 api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
-# api.add_resource(Login, '/login')
+api.add_resource(Login, '/login')
 parser = reqparse.RequestParser()
-parser.add_argument('token', type = str, required = True, help='Please submit a valid json.', location = 'json')
+parser.add_argument('token', type = str, required = False, help='Please submit a valid json.', location = 'json')
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
