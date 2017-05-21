@@ -9,6 +9,7 @@ from oauth2client import client, tools
 from oauth2client.file import Storage
 from random import randint
 import argparse
+import ast
 import datetime
 import httplib2
 import json
@@ -39,9 +40,12 @@ class Scheduler(Resource):
         return self.get()
 
 class Login(Resource):
+    def get(self):
+        return self.post()
     def post(self):
         try:
-            jsonRuby = json.loads(parser.parse_args())
+            jsonRuby = parser.parse_args(strict = True)['token']
+            jsonRuby = ast.literal_eval(jsonRuby)
             jsonPath = saveCredential(jsonRuby)
             connectCalendar(jsonPath)
             result = getCalendarList()
@@ -397,7 +401,7 @@ def saveCredential(jsonRuby):
         "scopes":[
           "https://www.googleapis.com/auth/calendar"
         ],
-        "token_expiry":longToDate(int(jsonRuby['expiration_time_millis']) / 1000),
+        "token_expiry":longToDate(jsonRuby['expiration_time_millis'] / 1000),
         "id_token":None,
         "user_agent":"Penjadwalan Seminar/Sidang",
         "access_token":jsonRuby['access_token'],
@@ -486,8 +490,6 @@ def getAllUserEvents():
 
 ######################################## VARIABLE ########################################
 
-flask = Flask(__name__)
-api = Api(flask)
 dbFirebase = None
 tokenFirebase = ''
 calendarService = None
@@ -505,11 +507,13 @@ ADMINPATH = os.path.join(os.getcwd(), 'admin')
 
 ######################################## MAIN ########################################
 
+flask = Flask(__name__)
+api = Api(flask)
 api.add_resource(Home, '/', endpoint = "home")
 api.add_resource(Scheduler, '/schedule')
 api.add_resource(Login, '/login')
 parser = reqparse.RequestParser()
-parser.add_argument('jsonRuby', type = str, required = True, help='Please submit a valid json.', location = 'form')
+parser.add_argument('token', type = str, required = False, help='Please submit a valid json.', location = 'json')
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
