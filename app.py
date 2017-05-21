@@ -50,8 +50,9 @@ class Login(Resource):
             jsonRuby = ast.literal_eval(jsonRuby)
             connectFirebase()
             parseDatabase()
-            checkLogin(jsonRuby)
-            return 'OK'
+            result = checkLogin(jsonRuby)
+            print 'Done.'
+            return result
         except Exception as e:
             return str(e)
 
@@ -517,13 +518,12 @@ def checkLogin(jsonRuby):
     for i in range(len(listLecturer)):
         # sudah pernah login sebelumnya, tinggal refresh token
         if (email == listLecturer[i].email):
-            print 'Old user, updating token...'
             listLecturer[i].token = convertToken(jsonRuby)
             updateSingleLecturerFirebase(listLecturer[i], i)
+            result = 'You are an old user, data updated.'
             found = True
             break
     if (not found):
-        print 'New user, saving data...'
         # user baru, bikin objek baru
         lecturerID = email
         name = email.split('@')[0]
@@ -539,6 +539,8 @@ def checkLogin(jsonRuby):
         # append ke objek local dan simpan di firebase
         updateSingleLecturerFirebase(lecturer, len(listLecturer))
         listLecturer.append(lecturer)
+        result = 'You are a new user, data added.'
+    return result
 
 def convertToken(jsonRuby):
     print 'Converting token...'
