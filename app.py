@@ -491,6 +491,7 @@ def getAllUserEvents():
     for filename in os.listdir(USERPATH):
         # load semua token milik dosen, dapatkan jadwalnya masing-masing
         try:
+            print 'Token:', filename
             jsonPath = os.path.join(USERPATH, filename)
             connectCalendar(jsonPath)
             events = getEvents(getCalendarList())
