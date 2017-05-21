@@ -505,15 +505,15 @@ ADMINPATH = os.path.join(os.getcwd(), 'admin')
 
 ######################################## MAIN ########################################
 
-# api.add_resource(Home, '/', endpoint = "home")
-# api.add_resource(Scheduler, '/schedule')
-# api.add_resource(Login, '/login')
-# parser = reqparse.RequestParser()
-# parser.add_argument('jsonRuby', type = str, required = True, help='Please submit a valid json.', location = 'form')
+api.add_resource(Home, '/', endpoint = "home")
+api.add_resource(Scheduler, '/schedule')
+api.add_resource(Login, '/login')
+parser = reqparse.RequestParser()
+parser.add_argument('jsonRuby', type = str, required = True, help='Please submit a valid json.', location = 'form')
 
-# if __name__ == "__main__":
-#     port = int(os.getenv('PORT', 5000))
-#     flask.run(debug=False, port=port, host='0.0.0.0')
+if __name__ == "__main__":
+    port = int(os.getenv('PORT', 5000))
+    flask.run(debug=False, port=port, host='0.0.0.0')
 
 ######################################## TEST ########################################
 
