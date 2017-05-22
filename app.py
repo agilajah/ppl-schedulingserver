@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ######################################## MODULE ########################################
 
 from __future__ import division
@@ -10,6 +11,20 @@ from oauth2client.file import Storage
 from random import randint
 import argparse
 import ast
+=======
+# LIBRARY
+from __future__ import division
+from flask import Flask, jsonify, json
+from flask import request
+from flask import make_response
+from flask_restful import Api, Resource
+from flask_restful import reqparse
+
+from copy import deepcopy
+from math import ceil, exp, floor
+from random import randint, seed, shuffle
+import calendar
+>>>>>>> 7f5b2318579c0fe539526912fd629c18fb73e8b2
 import datetime
 import httplib2
 import json
