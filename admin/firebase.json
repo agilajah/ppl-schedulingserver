@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "ppl-scheduling",
+  "private_key_id": "60eface719437e377ce4938eb94d95d2ebbc637f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCXeWczMr8jevi0\nAoLOyt3kJBpt6afhOKE751Wu3midjnh9SOFbTGQAoHBFirfPmXH7qX6ayhcN/afg\nQX3q0LEfCgPheOKHOfngeYJefJxBCTXCp5m331/wlDmp3PCGGXXSOURo5KLrPcIg\ngpeyBO5R2+eXKMr/5zsz2IuTHxew8tptJzJz23ga433XIUvGpzgFZaJlT8v4hP6x\nPWu4TrqOIj/gYObTuXrcrDpQFfQvOEGRUx7sbSYNwHfczBfxYzLihZt9yT240SxL\nOOcg6mpsqCU0aHkPr/vUR69tgfDZIwSIDqfDEqcpiRYW7PolCnGtlaDj86tYP+OT\nD66BF1fZAgMBAAECggEASVWkihwKf/H8UKJalCWRce+swAP8nESfgvIIAKZ6/bTJ\nTtanDF2amNcUJAb54M9IaO/xdJ1cthBVY3QxsyqgZgeiQ1oUSiXefTg2zuoDeFUu\nKvSbrnK97yrEFCH8bOAMs9+36BSxb7SxtK2lJbHPc+BEamF8jpJzjjFLucm23Zqn\nSjcc9ImNg5shHaAtFDOL0oUQ1A785GIDVZ9XUjv5PxZUb1AmtCi1G8bOfU+YhyX3\nm1RDXjhA4cOQU6JKI/zKlQ4FKII+udVQvPROMVDQoio/NCEw1gefTDpXqSFHXbal\n4FR4IxFY8ArF8a6r/sYXS9EqyNJ412GeUThHkq+NpQKBgQDFcctLZAfJW2iwGXWT\n+2/KWLiVDKt70RsQIti99C/sfL5pzXUwvJh/bw85iRN5kDHN8Pj2jEhXj42rSHQK\nHESOwDdqzZfEJTXWbf+OhivMGA3/BETAvapGvNjUYpVi5wa6jdXmLlUCkijqi2D9\no2jr1/giB+vLo6TxfsO/X4h4wwKBgQDEZX6ehbWJ9pK4bzZFCPE3toc/y+hQOTzM\nxu5AlsH/yNOs2P5VNh/A67riz4d2ZTxf0PTzd7bkFWtl0dPliXrLAioXPIngsG9A\n5oSz/1tKKW3yqSEGhFEJ6kLoiYRATeVMbi1LniLw1XjLdKj6fFZhwv1h/bjW1u6q\nP43ewr8DMwKBgEkJji1GRIcc1D4IPPFP2ouchDNGq4yyznMKoOirkqrFfl5/DTHJ\nIhRJzfT3mwel6naHBGGXhQ824C4TMDGpQUcZHabZhKGfLiozKIzdXwgxgcPrHU+7\nGWjvZLoz+ZTLZzbNTunGC9ZWoOIaSveoYiCUFIrqKTR8RYC75sc9HKunAoGABKFD\n5+bNDdCTSufMRrpcPWz/KUDcXC/NQCKccUdckXQhkVyYOlgJTZoBEOHFlsPyNWwO\nqkKzPBNJMeBNd4bTL0AA0AVsVrCyHryQelHVzBzH68WS8r1hz7MHGsZLKNztP+0F\nAlhbCIRv0ZQRe748pxdas9mwZtgwTjErXgoHSMMCgYEAuehmV35E2yH/WPABVX2h\ntlLQgMtmcQRxqvLSgCIuXcgaIa5/sqvFJYXi1kvo21Q/qr6qFT8OE44FZ5cWLXzy\nrRX+8uph2nS77DoyOAURYso+toyXQuj2J8JF1qKnqy9O3Rk953meUlR71PGh/Bcr\ngm/oCvko1Mosi3dQYjGSCZE=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-dvimt@ppl-scheduling.iam.gserviceaccount.com",
+  "client_id": "101101944453890112259",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-dvimt%40ppl-scheduling.iam.gserviceaccount.com"
+}
