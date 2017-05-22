@@ -1,0 +1,12 @@
+{
+  "token":{
+    "email":"ikhwan.m1996@gmail.com",
+    "client_id":"637504288783-0868kkjoilbol4l8o8bum9s9fkjji38t.apps.googleusercontent.com",
+    "access_token":"ya29.GltPBGyBm5f0u4U524qowqjsVjA-MiYTU3Xh7M-WDPW1odiq80sPaR6l084PcGjJckyX2kfJQqgDUgbTtMSFAPC-t5YF65n1HNkp9xQfverL4xzTeRVNC9ITl1Y2",
+    "refresh_token":"1/Y1mQ51qnJGZSe3rOk2BVZQBY_b_Q07DLWBuIZEC9egQ",
+    "scope":[
+      "https://www.googleapis.com/auth/calendar"
+    ],
+    "expiration_time_millis":1495212704000
+  }
+}
