@@ -47,7 +47,9 @@ class Login(Resource):
     def post(self):
         try:
             jsonRuby = parser.parse_args(strict = True)['token']
+
             jsonRuby = ast.literal_eval(jsonRuby)
+            print jsonRuby
             connectFirebase()
             parseDatabase()
             result = checkLogin(jsonRuby)
@@ -352,10 +354,16 @@ def parseDatabase():
     # parse semua data di firebase
     try:
         unparsedData = getFirebase('raw')
-        periodParser(unparsedData['period'])
-        roomParser(unparsedData['listRoom'])
-        lecturerParser(unparsedData['listLecturer'])
-        studentParser(unparsedData['listStudent'])
+        if unparsedData is not None:
+            if len(unparsedData) > 0:
+                periodParser(unparsedData['period'])
+                print 'Period parsed'
+                roomParser(unparsedData['listRoom'])
+                print 'Room parsed'
+                lecturerParser(unparsedData['listLecturer'])
+                print 'Lecturer parsed'
+                studentParser(unparsedData['listStudent'])
+                print 'Student parsed'
     except Exception as e:
         raise Exception('Failed to parse data from Firebase: ' + str(e))
 
@@ -369,50 +377,62 @@ def roomParser(unparsedRooms):
     global listRoom
     del listRoom[:]
     for unparsedRoom in unparsedRooms:
-        roomID = unparsedRoom['id']
-        name = unparsedRoom['name']
-        email = unparsedRoom['email']
-        events = []
-        if ('events' in unparsedRoom):
-            events = parseEventFirebase(unparsedRoom['events'])
-        # now we append all of those information here
-        listRoom.append(Room(roomID, name, email, events))
+        try:
+            roomID = unparsedRoom['id']
+            name = unparsedRoom['name']
+            email = unparsedRoom['email']
+            events = []
+            if ('events' in unparsedRoom):
+                events = parseEventFirebase(unparsedRoom['events'])
+            # now we append all of those information here
+            listRoom.append(Room(roomID, name, email, events))
+        except Exception as e:
+            continue
 
 def lecturerParser(unparsedLecturers):
     print 'Parsing lecturer data...'
     global listLecturer
     del listLecturer[:]
     for unparsedLecturer in unparsedLecturers:
-        lecturerID = unparsedLecturer['id']
-        name = unparsedLecturer['name'] + ' ' + unparsedLecturer['name']
-        email = unparsedLecturer['email']
-        topics = unparsedLecturer['topics']
-        token = unparsedLecturer['token']
-        events = []
-        if ('events' in unparsedLecturer):
-            events = parseEventFirebase(unparsedLecturer['events'])
-        # now we append all of those information here
-        listLecturer.append(Lecturer(lecturerID, name, email, topics, events, token))
+        try:
+            lecturerID = unparsedLecturer['id']
+            name = unparsedLecturer['name'] + ' ' + unparsedLecturer['name']
+            email = unparsedLecturer['email']
+            topics = unparsedLecturer['topics']
+            token = unparsedLecturer['token']
+            events = []
+            if ('events' in unparsedLecturer):
+                events = parseEventFirebase(unparsedLecturer['events'])
+            # now we append all of those information here
+            listLecturer.append(Lecturer(lecturerID, name, email, topics, events, token))
+        except Exception as e:
+            continue
 
 def studentParser(unparsedStudents):
     print 'Parsing student data...'
     global listStudent
     del listStudent[:]
     for unparsedStudent in unparsedStudents:
-        studentID = unparsedStudent['studentID']
-        name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
-        email = unparsedStudent['email']
-        topic = unparsedStudent['topics']
-        pembimbingID = unparsedStudent['pembimbingID']
-        pengujiID = unparsedStudent['pengujiID']
-        # now we append all of those information here
-        listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
+        try:
+            studentID = unparsedStudent['studentID']
+            name = unparsedStudent['name']['first'] + ' ' + unparsedStudent['name']['last']
+            email = unparsedStudent['email']
+            topic = unparsedStudent['topics']
+            pembimbingID = unparsedStudent['pembimbingID']
+            pengujiID = unparsedStudent['pengujiID']
+            # now we append all of those information here
+            listStudent.append(Student(studentID, name, email, topic, pembimbingID, pengujiID))
+        except Exception as e:
+            continue
 
 def parseEventFirebase(events):
     # parse event-event ruangan / dosen yang ada pada firebase
     resultEvents = []
     for event in events:
-        resultEvents.append(Event(event['id'], event['name'], event['start'], event['end']))
+        try:
+            resultEvents.append(Event(event['id'], event['name'], event['start'], event['end']))
+        except Exception as e:
+            continue
     return resultEvents
 
 def connectCalendar(jsonPath):
@@ -598,7 +618,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('token', type = str, required = False, help='Please submit a valid json.', location = 'json')
 
 if __name__ == "__main__":
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5002))
     flask.run(debug=False, port=port, host='0.0.0.0')
 
 ######################################## TEST ########################################
