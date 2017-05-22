@@ -528,13 +528,8 @@ def checkLogin(jsonRuby):
         lecturerID = email
         name = email.split('@')[0]
         topics = ['Informatics']
+        events = []
         token = convertToken(jsonRuby)
-        filename = 'user/temporaryToken.json'
-        with open(filename, 'w') as outFile:
-            json.dump(token, outFile)
-        jsonPath = os.path.join(USERPATH, filename)
-        connectCalendar(jsonPath)
-        events = parseEventFirebase(getEventsAll(getCalendarList()))
         lecturer = Lecturer(lecturerID, name, email, topics, events, token)
         # append ke objek local dan simpan di firebase
         updateSingleLecturerFirebase(lecturer, len(listLecturer))
